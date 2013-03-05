@@ -1,0 +1,24 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 11.00
+# Visual C# Express 2010
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FoodFighter", "FoodFighter\FoodFighter\FoodFighter.csproj", "{C8016007-4712-4CC9-8FF8-CD70C59C2DDB}"
+EndProject
+Project("{96E2B04D-8817-42C6-938A-82C39BA4D311}") = "FoodFighterContent", "FoodFighter\FoodFighterContent\FoodFighterContent.contentproj", "{FE47E149-AADD-46EA-BCB5-3496CB8570DB}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x86 = Debug|x86
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{C8016007-4712-4CC9-8FF8-CD70C59C2DDB}.Debug|x86.ActiveCfg = Debug|x86
+		{C8016007-4712-4CC9-8FF8-CD70C59C2DDB}.Debug|x86.Build.0 = Debug|x86
+		{C8016007-4712-4CC9-8FF8-CD70C59C2DDB}.Release|x86.ActiveCfg = Release|x86
+		{C8016007-4712-4CC9-8FF8-CD70C59C2DDB}.Release|x86.Build.0 = Release|x86
+		{FE47E149-AADD-46EA-BCB5-3496CB8570DB}.Debug|x86.ActiveCfg = Debug|x86
+		{FE47E149-AADD-46EA-BCB5-3496CB8570DB}.Release|x86.ActiveCfg = Release|x86
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+EndGlobal
