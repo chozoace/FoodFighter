@@ -60,10 +60,12 @@ namespace FoodFighter
         LightAttack lAttack = null;
         MediumAttack mAttack = null;
         HeavyAttack hAttack = null;
+        SpecialAttack sAttack = null;
         GrabOne grab1 = null;
         public bool canAttack = true;
         bool canJpress = true;
         bool canKpress = true;
+        bool canLpress = true;
         //////////
         //Animation variables
         //////////
@@ -125,7 +127,7 @@ namespace FoodFighter
 
         public override void Update()
         {
-            //hud.setPosition(position.X);
+            //Debug.WriteLine(myState);
             myKeyState = Keyboard.GetState();
             padState = GamePad.GetState(PlayerIndex.One);
             if (myState != PlayerState.Dead)
@@ -318,6 +320,7 @@ namespace FoodFighter
                     {
                         if (currentChain == 0)
                         {
+                            Debug.WriteLine("attack");
                             currentChain = 1;
 
                             currentAccel = 0;
@@ -378,6 +381,20 @@ namespace FoodFighter
                         canKpress = false;
 
                         grab();
+                    }
+                }
+                if (keyState.IsKeyDown(Keys.L) == true && previousKeyState.IsKeyDown(Keys.L) == true)
+                {
+                    if (CheckCollision(BottomBox) && currentChain < 1 && canAttack && canLpress)
+                    {
+                        Debug.WriteLine("pressing L");
+                        currentAccel = 0;
+                        speed.X = 0;
+                        myState = PlayerState.Attacking;
+                        canAttack = false;
+                        canLpress = false;
+
+                        heavyAttack();
                     }
                 }
 
@@ -478,6 +495,20 @@ namespace FoodFighter
                         grab();
                     }
                 }
+                if (keyState.IsButtonDown(Buttons.B) == true && previousButtonState.IsButtonDown(Buttons.B) == true)
+                {
+                    if (CheckCollision(BottomBox) && currentChain < 1 && canAttack && canLpress)
+                    {
+                        Debug.WriteLine("pressing K");
+                        currentAccel = 0;
+                        speed.X = 0;
+                        myState = PlayerState.Attacking;
+                        canAttack = false;
+                        canLpress = false;
+
+                        heavyAttack();
+                    }
+                }
             }
             previousButtonState = keyState;
         }
@@ -495,6 +526,11 @@ namespace FoodFighter
                 {
                     if (canKpress == false)
                         canKpress = true;
+                }
+                if (keyState.IsKeyUp(Keys.L) == true)
+                {
+                    if (canLpress == false)
+                        canLpress = true;
                 }
             }
 
@@ -540,6 +576,11 @@ namespace FoodFighter
                 {
                     if (canKpress == false)
                         canKpress = true;
+                }
+                if (keyState.IsButtonUp(Buttons.B) == true)
+                {
+                    if (canLpress == false)
+                        canLpress = true;
                 }
             }
 
@@ -753,11 +794,17 @@ namespace FoodFighter
             }
         }
 
+        public void heavyAttack()
+        {
+            sAttack = new SpecialAttack((int)(position.X), (int)(position.Y), Game1.Instance().getContent(), facing);
+        }
+
         public void attacksToNull()
         {
             lAttack = null;
             mAttack = null;
             hAttack = null;
+            sAttack = null;
         }
 
         public override bool CheckCollision(Rectangle collisionBox)
@@ -792,6 +839,7 @@ namespace FoodFighter
 
         public override void endHitstun(object sender, ElapsedEventArgs e)
         {
+            Debug.WriteLine("From End");
             myState = PlayerState.Idle;
             base.endHitstun(sender, e);
         }

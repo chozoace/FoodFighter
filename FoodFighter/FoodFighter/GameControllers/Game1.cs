@@ -82,7 +82,7 @@ namespace FoodFighter
         {
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed)
                 this.Exit();
-            Debug.WriteLine(gameState);
+
             if (gameState == GameState.Gameplay)
             {
                 levelManager.Update();

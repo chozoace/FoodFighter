@@ -14,17 +14,17 @@ using System.Timers;
 
 namespace FoodFighter
 {
-    class MediumAttack : Hitbox
+    class SpecialAttack : Hitbox
     {
-        public MediumAttack(int x, int y, ContentManager content, int facing)
+        public SpecialAttack(int x, int y, ContentManager content, int facing)
         {
-            visible = false;
+            visible = true;
             isEnemyAttack = false;
-            inChain = true;
+            inChain = false;
             startup = 30;
             active = 200;
             recovery = 800;
-            stunTime = 1000;
+            stunTime = 1500;
             //totalFrames = 15; //what is this
             startupTimer = new Timer(startup);
             activeTimer = new Timer(active);
@@ -47,7 +47,7 @@ namespace FoodFighter
             width = 40;
             height = 10;
             texture = content.Load<Texture2D>("LevelObjects/Block2");
-            damage = 50;
+            damage = 100;
 
             //begin animation
 
@@ -60,6 +60,41 @@ namespace FoodFighter
             //after recovery restore controls
             recoveryTimer.Elapsed += new ElapsedEventHandler(unlockControls);
             recoveryTimer.Enabled = true;
+        }
+
+        public override void onHitboxHit(Enemy enemy)
+        {
+            if (enemy.enemyState != Enemy.EnemyState.Hitstun)
+            {
+                enemy.hitBoxCollide(stunTime);
+                enemy.health -= damage;
+                enemy.position.Y -= 2;
+                enemy.speed.Y = -13;
+                if (enemy.facing == 0)
+                    enemy.speed.X = -6;
+                else
+                    enemy.speed.X = 6;
+                
+                canDamage = false;
+            }
+            else
+            {
+                //turn off timers
+                if (enemy.comboTime != null)
+                {
+                    enemy.comboTime.Dispose();
+                }
+                enemy.hitBoxCollide(stunTime);
+                enemy.health -= damage;
+                enemy.position.Y -= 2;
+                enemy.speed.Y = -13;
+                if (enemy.facing == 0)
+                    enemy.speed.X = -6;
+                else
+                    enemy.speed.X = 6;
+
+                canDamage = false;
+            }
         }
 
         public override void Draw(SpriteBatch spriteBatch, Vector2 camera)

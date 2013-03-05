@@ -20,6 +20,7 @@ namespace FoodFighter
         {
             visible = false;
             isEnemyAttack = false;
+            inChain = true;
             startup = 30;
             active = 200;
             recovery = 800;

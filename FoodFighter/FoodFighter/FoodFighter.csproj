@@ -120,6 +120,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Hitboxes\SpecialAttack.cs" />
     <Compile Include="SpriteClasses\Background.cs" />
     <Compile Include="Effects\EffectController.cs" />
     <Compile Include="Effects\EffectsComponent.cs" />

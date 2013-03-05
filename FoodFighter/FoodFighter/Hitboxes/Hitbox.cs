@@ -35,6 +35,7 @@ namespace FoodFighter
         protected bool canDamage = true; //so hitbox only hurts once
         protected bool isEnemyAttack;
         protected bool isGrab = false;
+        protected bool inChain = false;
 
         public Hitbox()
         {
@@ -52,7 +53,7 @@ namespace FoodFighter
             myHitBox = new Rectangle((int)(position.X), (int)(position.Y), width, height);
             LevelManager.Instance().addToSpriteList(this);
 
-            if(LevelManager.Instance().player.currentChain < 3 && !isGrab)
+            if(LevelManager.Instance().player.currentChain < 3 && inChain)
                 LevelManager.Instance().player.canAttack = true;
 
             startupTimer.Dispose();

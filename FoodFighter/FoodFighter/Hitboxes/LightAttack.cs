@@ -20,6 +20,7 @@ namespace FoodFighter
         {
             visible = false;
             isEnemyAttack = false;
+            inChain = true;
             startup = 20;
             active = 200;
             recovery = 600;
@@ -46,7 +47,7 @@ namespace FoodFighter
             width = 30;
             height = 10;
             texture = content.Load<Texture2D>("LevelObjects/Block2");
-            damage = 25;
+            damage = 0;
 
             //begin animation
 

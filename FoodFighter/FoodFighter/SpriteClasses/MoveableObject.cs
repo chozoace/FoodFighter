@@ -53,6 +53,9 @@ namespace FoodFighter
         public bool hitstun = false;//dictates invin time, player cant be comboed so it only uses hitstun
         protected Timer hitstunTimer = new Timer();
 
+        int debugCounter = 0;
+        int debugCounter2 = 0;
+
         public void UpdateAnimation(object sender, ElapsedEventArgs e)
         {
             currentFrame = animationRect.X / 64;
@@ -73,6 +76,7 @@ namespace FoodFighter
 
         public virtual void startHitstun(int stunTime)
         {
+            hitstunTimer.Dispose();
             hitstunTimer = new Timer(stunTime);
             hitstunTimer.Elapsed += new ElapsedEventHandler(endHitstun);
             hitstunTimer.Enabled = true;

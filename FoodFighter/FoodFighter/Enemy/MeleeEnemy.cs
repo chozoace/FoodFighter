@@ -111,7 +111,6 @@ namespace FoodFighter
                 }
             }
             base.Update();
-            Debug.WriteLine(currentAnimation);
         }
 
         public virtual void UpdateMovement()
@@ -133,7 +132,8 @@ namespace FoodFighter
                     else if (enemyState != EnemyState.Attacking)
                     {
                         enemyState = EnemyState.Attacking;
-                        //attack();
+                        //currentEvent = new EventHandler(attackEvent);
+                        attack();
                     }
                 }
                 if (facing == 0)
@@ -149,7 +149,8 @@ namespace FoodFighter
                     else if(enemyState != EnemyState.Attacking)
                     {
                         enemyState = EnemyState.Attacking;
-                        //attack();
+                        //currentEvent = new EventHandler(attackEvent);
+                        attack();
                     }
                 }
             }
@@ -320,6 +321,48 @@ namespace FoodFighter
             }
 
             return base.CheckCollision(collisionBox);
+        }
+
+        public void attackEvent(object sender, EventArgs e)
+        {
+            if (facing == 0 && currentAnimation != attackAnim)
+            {
+                animationRect = new Rectangle(0, 0, width, height);
+                texture = myContent.Load<Texture2D>(attackAnim);
+                currentAnimation = attackAnim;
+
+                theAttack = new EnemyMeleeAttack((int)(position.X), (int)(position.Y), facing);
+                activeTimer = new Timer(500);
+                activeTimer.Elapsed += new ElapsedEventHandler(removeAttack);
+                activeTimer.Enabled = true;
+
+                //canLoop = true;
+                //canAttack = true;
+                currentAnimation = idleAnim;
+                animationRect = new Rectangle(0, 0, width, height);
+                texture = enemyContent.Load<Texture2D>(currentAnimation);
+                //attackCooldown.Elapsed += new ElapsedEventHandler(attack);
+                //attackCooldown.Enabled = true;                
+            }
+            else if (facing == 1 && currentAnimation != attackLeftAnim)
+            {
+                animationRect = new Rectangle(0, 0, width, height);
+                texture = myContent.Load<Texture2D>(attackLeftAnim);
+                currentAnimation = attackLeftAnim;
+
+                theAttack = new EnemyMeleeAttack((int)(position.X), (int)(position.Y), facing);
+                activeTimer = new Timer(500);
+                activeTimer.Elapsed += new ElapsedEventHandler(removeAttack);
+                activeTimer.Enabled = true;
+
+                //canLoop = true;
+                //canAttack = true;
+                currentAnimation = idleLeftAnim;
+                animationRect = new Rectangle(0, 0, width, height);
+                texture = enemyContent.Load<Texture2D>(idleLeftAnim);
+                //attackCooldown.Elapsed += new ElapsedEventHandler(attack);//recovery
+                //attackCooldown.Enabled = true;
+            }
         }
 
         public virtual void attack()

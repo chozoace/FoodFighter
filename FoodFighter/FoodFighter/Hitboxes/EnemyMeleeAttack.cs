@@ -49,7 +49,7 @@ namespace FoodFighter
             width = 30;
             height = 10;
             texture = content.Load<Texture2D>("LevelObjects/Block2");
-            damage = 50;
+            damage = 0;
 
             //after startup create attack
             startupTimer.Elapsed += new ElapsedEventHandler(createAttack);

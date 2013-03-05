@@ -21,7 +21,7 @@ namespace FoodFighter
 
         public GrabOne(int x, int y, ContentManager content, int facing)
         {
-            isGrab = true;
+            inChain = false;
             visible = true;
             isEnemyAttack = false;
             startup = 20;
