@@ -122,6 +122,11 @@ namespace FoodFighter
                             LevelManager.Instance().addToEnemyList(enemy);
                             LevelManager.Instance().addToSpriteList(enemy);
                             break;
+                        case 7:
+                            enemy = new FryEnemy(new Vector2(destX, destY));
+                            LevelManager.Instance().addToEnemyList(enemy);
+                            LevelManager.Instance().addToSpriteList(enemy);
+                            break;
                     }
                 }
             }

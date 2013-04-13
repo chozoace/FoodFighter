@@ -133,7 +133,7 @@ namespace FoodFighter
                     {
                         enemyState = EnemyState.Attacking;
                         //currentEvent = new EventHandler(attackEvent);
-                        attack();
+                        //attack();
                     }
                 }
                 if (facing == 0)
@@ -150,7 +150,7 @@ namespace FoodFighter
                     {
                         enemyState = EnemyState.Attacking;
                         //currentEvent = new EventHandler(attackEvent);
-                        attack();
+                        //attack();
                     }
                 }
             }

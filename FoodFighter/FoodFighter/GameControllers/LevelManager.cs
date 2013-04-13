@@ -70,7 +70,8 @@ namespace FoodFighter
 
         public void LoadContent()
         {
-            level.loadLevel("Content/XML/TestLevel.xml");
+            //level.loadLevel("Content/XML/TestLevel.xml");
+            level.loadLevel("Content/XML/Level1.xml");
             listWalls = level.getWallList();
             player.LoadContent(lmContent);
         }
@@ -129,11 +130,11 @@ namespace FoodFighter
             {
                 if (player.BoundingBox.Y > camera.Y + 208)
                 {
-                    //camera.Y = player.BoundingBox.Y + 208;
+                    camera.Y = player.BoundingBox.Y + 208;
                 }
                 if (player.BoundingBox.Y < camera.Y + 208)
                 {
-                    //camera.Y = player.BoundingBox.Y - 208;
+                    camera.Y = player.BoundingBox.Y - 208;
                 }
                 if (player.BoundingBox.X > camera.X + 288)
                 {

@@ -17,7 +17,7 @@ namespace FoodFighter
     class HUD : Sprite
     {
         int xOffset = 80;
-        int yOffset = 200;
+        int yOffset = 170;
         public SpriteFont Font { get; set; }
 
         public int Score { get; set; }
@@ -33,12 +33,12 @@ namespace FoodFighter
             //position.X = x + xOffset;
         }
 
-        public void Draw(SpriteBatch spriteBatch, Vector2 camera, float playerPosition)
+        public void Draw(SpriteBatch spriteBatch, Vector2 camera, Vector2 playerPosition)
         {
             spriteBatch.DrawString(
                 Font,                           // SpriteFont
                 "Calories Burned: " + Score.ToString(),   // Text
-                new Vector2((playerPosition + xOffset) - camera.X, position.Y - camera.Y),   // Position
+                new Vector2((playerPosition.X + xOffset) - camera.X, (playerPosition.Y - yOffset) - camera.Y),   // Position
                 Color.Crimson);  
         }
     }

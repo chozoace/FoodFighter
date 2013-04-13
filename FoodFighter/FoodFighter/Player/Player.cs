@@ -20,6 +20,14 @@ namespace FoodFighter
         SpriteBatch mySpriteBatch;
 
         //variables and properties
+        public enum FatState
+        {
+            Level1,
+            Level2,
+            Level3
+        }
+        public FatState fatState;
+
         public enum PlayerState 
         { 
             Jumping,
@@ -33,7 +41,7 @@ namespace FoodFighter
         public PlayerState myState, previousState;
         KeyboardState myKeyState, previousKeyState;
         GamePadState previousButtonState;
-        public Rectangle healthBar { get { return new Rectangle((int)(position.X - 290), 0, 250, 80); } }
+        public Rectangle healthBar { get { return new Rectangle((int)(position.X - 290), (int)(position.Y - 200), 250, 80); } }
         public HUD hud;
 
         //////////
@@ -80,6 +88,8 @@ namespace FoodFighter
 
         public Player(Vector2 newPos)
         {
+            fatState = FatState.Level1;
+
             hud = new HUD(position.X);
             hud.Font = Game1.Instance().Content.Load<SpriteFont>("Arial");
             hud.Score = 0;
@@ -151,6 +161,40 @@ namespace FoodFighter
                 myState = PlayerState.Dead;
                 controlsLocked = true;
                 death();
+            }
+
+            if (fatState == FatState.Level1 && hud.Score >= 10)
+            {
+                transform();
+            }
+        }
+
+        public void transform()
+        {
+            if (fatState == FatState.Level1)
+            {
+                fatState = FatState.Level2;
+                jumpSpeed = -18;
+                maxSpeed = 10; 
+
+                idleAnim = "Player/Level2/HeroIdleRight";
+                idleLeftAnim = "Player/Level2/HeroIdleLeft";
+                runAnim = "Player/Level2/HeroWalkRight";
+                runLeftAnim = "Player/Level2/HeroWalkLeft";
+                lightRight = "Player/Level2/HeroLightRight";
+                lightLeft = "Player/Level2/HeroLightLeft";
+                midRight = "robo_running";
+                midLeft = "robo_running_left";
+                heavyRight = "Player/Level2/HeroHeavyRight";
+                heavyLeft = "Player/Level2/HeroHeavyLeft";
+                hurtLeft = "Player/Level2/HeroLeftHurt";
+                hurtRight = "Player/Level2/HeroRightHurt";
+                jumpLeft = "Player/Level2/HeroJumpLeft";
+                jumpRight = "Player/Level2/HeroJumpRight";
+            }
+            else if (fatState == FatState.Level2)
+            {
+
             }
         }
 
@@ -848,7 +892,7 @@ namespace FoodFighter
         {
             //drawCollisionBox(spriteBatch, myContent, camera);
             Texture2D healthImage = myContent.Load<Texture2D>("Player/healthBarBig");
-            hud.Draw(spriteBatch, camera, position.X);
+            hud.Draw(spriteBatch, camera, position);
 
             spriteBatch.Draw(healthImage, new Rectangle((int)(healthBar.X - camera.X), (int)(healthBar.Y - camera.Y), healthBar.Width, healthBar.Height), Color.White);
             base.Draw(spriteBatch, camera);
