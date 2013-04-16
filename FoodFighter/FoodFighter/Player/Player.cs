@@ -711,7 +711,7 @@ namespace FoodFighter
                         collidingWall.position.X -= 15;
                     }
                 }
-                else
+                else if (speed.Y > 0)
                 {
                     position.Y = collidingWall.BoundingBox.Y - height;
                     speed.Y = 0;
@@ -727,8 +727,8 @@ namespace FoodFighter
 
                 if(CheckCollision(UpperBox))
                 {
-                    position.Y = collidingWall.BoundingBox.Y + collidingWall.BoundingBox.Height;
-                    speed.Y *= -1;
+                    //position.Y = collidingWall.BoundingBox.Y + collidingWall.BoundingBox.Height;
+                    //speed.Y *= -1;
                 }
             }
             #endregion

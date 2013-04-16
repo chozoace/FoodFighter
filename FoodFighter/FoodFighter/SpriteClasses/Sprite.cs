@@ -34,13 +34,14 @@ namespace FoodFighter
             mySpriteBatch = Game1.Instance().getSpriteBatch();
         }
 
-        public Sprite(String tex)
+        public Sprite(String tex, int x = 0, int y = 0)
         {
             myContent = Game1.Instance().getContent();
             mySpriteBatch = Game1.Instance().getSpriteBatch();
+            position = new Vector2(x, y);
 
             texture = myContent.Load<Texture2D>(tex);
-        }
+        } 
 
         public virtual void Update()
         {

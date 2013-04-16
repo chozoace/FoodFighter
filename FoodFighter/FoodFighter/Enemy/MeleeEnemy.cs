@@ -123,11 +123,14 @@ namespace FoodFighter
                 {
                     if (!CheckAttackRange())
                     {
-                        if (CheckCollision(LeftBox))
-                            position.X += Xspeed;
-                        position.X -= Xspeed;
+                        if (position.Y - LevelManager.Instance().player.position.Y <= 64 && LevelManager.Instance().player.position.Y - position.Y <= 64)
+                        {
+                            if (CheckCollision(LeftBox))
+                                position.X += Xspeed;
+                            position.X -= Xspeed;
 
-                        enemyState = EnemyState.Running;
+                            enemyState = EnemyState.Running;
+                        }
                     }
                     else if (enemyState != EnemyState.Attacking)
                     {
@@ -140,11 +143,14 @@ namespace FoodFighter
                 {
                     if (!CheckAttackRange())
                     {
-                        if (CheckCollision(RightBox))
-                            position.X -= Xspeed;
-                        position.X += Xspeed;
+                        if (position.Y - LevelManager.Instance().player.position.Y <= 64 && LevelManager.Instance().player.position.Y - position.Y <= 64)
+                        {
+                            if (CheckCollision(RightBox))
+                                position.X -= Xspeed;
+                            position.X += Xspeed;
 
-                        enemyState = EnemyState.Running;
+                            enemyState = EnemyState.Running;
+                        }
                     }
                     else if(enemyState != EnemyState.Attacking)
                     {
@@ -444,14 +450,16 @@ namespace FoodFighter
             {
                 if (position.X - (player.position.X) < attackRange)
                 {
-                    return true;
+                    if (position.Y - player.position.Y <= 64 && player.position.Y - position.Y <= 64)
+                        return true;
                 }
             }
             else if (facing == 0)
             {
                 if (player.position.X - (position.X) < attackRange + 4)
                 {
-                    return true;
+                    if (position.Y - player.position.Y <= 64 && player.position.Y - position.Y <= 64)
+                        return true;
                 }
             }
             return false;

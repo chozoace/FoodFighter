@@ -108,11 +108,14 @@ namespace FoodFighter
                 {
                     if (!CheckAttackRange())
                     {
-                        if (CheckCollision(LeftBox))
-                            position.X += Xspeed;
-                        position.X -= Xspeed;
+                        if (position.Y - LevelManager.Instance().player.position.Y <= 64 && LevelManager.Instance().player.position.Y - position.Y <= 64)
+                        {
+                            if (CheckCollision(LeftBox))
+                                position.X += Xspeed;
+                            position.X -= Xspeed;
 
-                        enemyState = EnemyState.Running;
+                            enemyState = EnemyState.Running;
+                        }
                     }
                     else if (enemyState != EnemyState.Attacking)
                     {
@@ -124,11 +127,14 @@ namespace FoodFighter
                 {
                     if (!CheckAttackRange())
                     {
-                        if (CheckCollision(RightBox))
-                            position.X -= Xspeed;
-                        position.X += Xspeed;
+                        if (position.Y - LevelManager.Instance().player.position.Y <= 64 && LevelManager.Instance().player.position.Y - position.Y <= 64)
+                        {
+                            if (CheckCollision(RightBox))
+                                position.X -= Xspeed;
+                            position.X += Xspeed;
 
-                        enemyState = EnemyState.Running;
+                            enemyState = EnemyState.Running;
+                        }
                     }
                     else if (enemyState != EnemyState.Attacking)
                     {

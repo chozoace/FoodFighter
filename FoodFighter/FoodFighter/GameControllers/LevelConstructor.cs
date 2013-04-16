@@ -36,6 +36,8 @@ namespace FoodFighter
         List<int> gidList = new List<int>();
         List<int> gidList2 = new List<int>();
 
+        string regularLevel1 = "Content/XML/Level1.xml";
+
         public LevelConstructor()
         {
             instance = this;
@@ -58,25 +60,69 @@ namespace FoodFighter
         }
 
         //begin XML here
-        public void XmlLoad(String level)
+        //public void XmlLoad(String level)
+        //{
+        //    //map, tileset and layer, data, tile 
+        //    xDoc = new XmlDocument();
+        //    xDoc.Load(level);
+        //    XmlNode mapData = xDoc.FirstChild;
+        //    numberOfTiles = mapData.FirstChild.NextSibling.FirstChild.ChildNodes.Count;
+        //    mapWidth = int.Parse(mapData.Attributes.GetNamedItem("width").Value);
+        //    mapHeight = int.Parse(mapData.Attributes.GetNamedItem("height").Value);
+        //    tileWidth = int.Parse(mapData.Attributes.GetNamedItem("tilewidth").Value);
+        //    tileHeight = int.Parse(mapData.Attributes.GetNamedItem("tileheight").Value);
+
+        //    //gidlist is single dimensional array
+        //    foreach (XmlNode xNode in mapData.FirstChild.NextSibling.FirstChild.ChildNodes)
+        //    {
+        //        gidList.Add(int.Parse(xNode.Attributes.GetNamedItem("gid").Value));
+        //    }
+
+        //    tileLoad();
+        //}
+
+        public void XmlLoad(String level, bool loadBackground = true)
         {
             //map, tileset and layer, data, tile 
             xDoc = new XmlDocument();
+            //sending it the parameter fucks it up
             xDoc.Load(level);
             XmlNode mapData = xDoc.FirstChild;
-            numberOfTiles = mapData.FirstChild.NextSibling.FirstChild.ChildNodes.Count;
+            if (!loadBackground)
+            {
+                numberOfTiles = mapData.FirstChild.NextSibling.NextSibling.FirstChild.ChildNodes.Count;
+                Debug.WriteLine("here");
+            }
+            else
+            {
+                numberOfTiles = mapData.FirstChild.NextSibling.NextSibling.NextSibling.FirstChild.ChildNodes.Count;
+                Debug.WriteLine("now here");
+            }
             mapWidth = int.Parse(mapData.Attributes.GetNamedItem("width").Value);
             mapHeight = int.Parse(mapData.Attributes.GetNamedItem("height").Value);
             tileWidth = int.Parse(mapData.Attributes.GetNamedItem("tilewidth").Value);
             tileHeight = int.Parse(mapData.Attributes.GetNamedItem("tileheight").Value);
 
             //gidlist is single dimensional array
-            foreach (XmlNode xNode in mapData.FirstChild.NextSibling.FirstChild.ChildNodes)
+            if (!loadBackground)
             {
-                gidList.Add(int.Parse(xNode.Attributes.GetNamedItem("gid").Value));
+                gidList.Clear();
+                foreach (XmlNode xNode in mapData.FirstChild.NextSibling.NextSibling.FirstChild.ChildNodes)
+                {
+                    gidList.Add(int.Parse(xNode.Attributes.GetNamedItem("gid").Value));
+                }
+                tileLoad();
+            }
+            else
+            {
+                foreach (XmlNode xNode in mapData.FirstChild.NextSibling.NextSibling.NextSibling.FirstChild.ChildNodes)
+                {
+                    gidList.Add(int.Parse(xNode.Attributes.GetNamedItem("gid").Value));
+                }
+                tileLoadBackground();
             }
 
-            tileLoad();
+            //tileLoad();
         }
 
         public void tileLoad()
@@ -133,6 +179,54 @@ namespace FoodFighter
             LevelManager.Instance().player = new Player(new Vector2(playerXpos, playerYpos));
             //LevelManager.Instance().addToEnemyList(enemy);
             LevelManager.Instance().addToSpriteList(LevelManager.Instance().player);
+
+        }
+
+        public void tileLoadBackground()
+        {
+            Sprite theSprite;
+
+            for (int spriteforX = 0; spriteforX < mapWidth; spriteforX++)
+            {
+                for (int spriteForY = 0; spriteForY < mapHeight; spriteForY++)
+                {
+                    int destY = spriteForY * tileHeight;
+                    int destX = spriteforX * tileWidth;
+
+                    switch (getTileAt(spriteforX, spriteForY))
+                    {
+                        case 9:
+                            theSprite = new Sprite("Buildings/build1", destX, destY);
+                            LevelManager.Instance().addToSpriteList(theSprite);
+                            break;
+                        case 10:
+                            theSprite = new Sprite("Buildings/build2", destX, destY);
+                            LevelManager.Instance().addToSpriteList(theSprite);
+                            break;
+                        case 11:
+                            theSprite = new Sprite("Buildings/build3", destX, destY);
+                            LevelManager.Instance().addToSpriteList(theSprite);
+                            break;
+                        case 12:
+                            theSprite = new Sprite("Buildings/build4", destX, destY);
+                            LevelManager.Instance().addToSpriteList(theSprite);
+                            break;
+                        case 13:
+                            theSprite = new Sprite("Buildings/build5", destX, destY);
+                            LevelManager.Instance().addToSpriteList(theSprite);
+                            break;
+                        case 14:
+                            theSprite = new Sprite("Buildings/build6", destX, destY);
+                            LevelManager.Instance().addToSpriteList(theSprite);
+                            break;
+                        case 15:
+                            theSprite = new Sprite("Buildings/build7", destX, destY);
+                            LevelManager.Instance().addToSpriteList(theSprite);
+                            break;
+                    }
+                }
+            }
+            XmlLoad("Content/XML/Level1.xml", false);
         }
 
         public int getTileAt(int x, int y)

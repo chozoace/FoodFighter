@@ -38,7 +38,7 @@ namespace FoodFighter
         bool paused = false;
         public static LevelManager instance;
 
-        Sprite background = new Sprite("Backgrounds/Background1");
+        Sprite background = new Sprite("Backgrounds/BLevel1");
         Vector2 backgroundCamera = new Vector2(0, 0);
 
         public LevelManager(ContentManager content, SpriteBatch spriteBatch)

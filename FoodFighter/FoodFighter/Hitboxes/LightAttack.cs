@@ -47,7 +47,7 @@ namespace FoodFighter
             width = 30;
             height = 10;
             texture = content.Load<Texture2D>("LevelObjects/Block2");
-            damage = 0;
+            damage = 25;
 
             //begin animation
 
