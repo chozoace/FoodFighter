@@ -89,7 +89,7 @@ namespace FoodFighter
 
                 if (!songStarted)
                 {
-                    //MediaPlayer.Play(song);
+                    MediaPlayer.Play(song);
                     songStarted = true;
                 }
             }

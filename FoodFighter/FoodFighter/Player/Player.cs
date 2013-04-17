@@ -95,7 +95,7 @@ namespace FoodFighter
             hud.Score = 0;
             gravity = 1f;
 
-            health = 5000;
+            health = 400;
             height = 64;
             width = 64;
             position = newPos;
