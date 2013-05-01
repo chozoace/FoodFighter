@@ -1,0 +1,1 @@
+﻿<playerStats  maxSpeed= "6"  jumpSpeed= "-13" maxSpeedLevel2= "10" jumpSpeedLevel2="-18" firstTransformThreshold="60" accelRate ="0.8" decelRate="1.8" gravity="1" fallSpeed="10"/>

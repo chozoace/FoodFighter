@@ -21,7 +21,8 @@ namespace FoodFighter
         public enum LevelState
         {
             Gameplay,
-            Restarting
+            Restarting,
+            NextLevel,
         }
         public LevelState levelState = LevelState.Gameplay;
 
@@ -37,9 +38,15 @@ namespace FoodFighter
         float camMoveSpeed = 5f;
         bool paused = false;
         public static LevelManager instance;
+        public int lives = 3;
 
         Sprite background = new Sprite("Backgrounds/BLevel1");
         Vector2 backgroundCamera = new Vector2(0, 0);
+
+        Texture2D blackScreen;
+        Color fadeColor = Color.Black;
+        Rectangle fadeRect = new Rectangle(0, 0, Game1.Instance().GraphicsDevice.Viewport.Width, Game1.Instance().GraphicsDevice.Viewport.Height);
+        int fadeCounter = 5;
 
         public LevelManager(ContentManager content, SpriteBatch spriteBatch)
         {
@@ -57,11 +64,6 @@ namespace FoodFighter
         public void Initialize()
         {
             level = new LevelConstructor();
-            //if (player == null)
-            //{
-            //    player = new Player();
-            //    spriteList.Add(player);
-            //}
 
             LoadContent();
             levelState = LevelState.Gameplay;
@@ -74,6 +76,7 @@ namespace FoodFighter
             level.loadLevel("Content/XML/Level1.xml");
             listWalls = level.getWallList();
             player.LoadContent(lmContent);
+            blackScreen = Game1.Instance().Content.Load<Texture2D>("Menus/BlackScreen");
         }
 
         public void addToSpriteList(Sprite theSprite)
@@ -103,7 +106,6 @@ namespace FoodFighter
 
         public void Update()
         {
-            //Debug.WriteLine("num in list: " + spriteList.Count);
             if (levelState == LevelState.Gameplay)
             {
                 foreach (Sprite sprite in spriteList.ToList<Sprite>())
@@ -111,6 +113,10 @@ namespace FoodFighter
                     sprite.Update();
                 }
                 UpdateCamera();
+            }
+            else if (levelState == LevelState.Restarting)
+            {
+                fade();
             }
             if (clearLists)//restarts level
             {
@@ -130,11 +136,12 @@ namespace FoodFighter
             {
                 if (player.BoundingBox.Y > camera.Y + 208)
                 {
-                    camera.Y = player.BoundingBox.Y + 208;
+                   if(player.BoundingBox.Y - 208 <= 0)
+                        camera.Y = player.BoundingBox.Y + 208;
                 }
                 if (player.BoundingBox.Y < camera.Y + 208)
                 {
-                    camera.Y = player.BoundingBox.Y - 208;
+                       camera.Y = player.BoundingBox.Y - 208;
                 }
                 if (player.BoundingBox.X > camera.X + 288)
                 {
@@ -154,40 +161,84 @@ namespace FoodFighter
 
         }
 
+        public void fade()
+        {
+            fadeColor.A = (byte)MathHelper.Clamp(fadeColor.A + fadeCounter, 0, 255);
+
+            if (fadeColor.A == 0)
+            {
+                levelState = LevelState.Gameplay;
+                fadeCounter *= -1;
+            }
+            else if (fadeColor.A == 255)
+            {
+                clearLists = true;
+                fadeCounter *= -1;
+                camera.X = player.BoundingBox.X - 288;
+
+            }
+        }
+
         public void drawGame(SpriteBatch spriteBatch)
         {
-            background.Draw(spriteBatch, backgroundCamera);
-            background.Draw(spriteBatch, backgroundCamera + new Vector2(640, 0));
-            background.Draw(spriteBatch, backgroundCamera - new Vector2(640, 0));
-            foreach (Sprite sprite in spriteList)
+            if (levelState == LevelState.Gameplay)
             {
-                sprite.Draw(spriteBatch, camera);
+                background.Draw(spriteBatch, backgroundCamera);
+                background.Draw(spriteBatch, backgroundCamera + new Vector2(640, 0));
+                background.Draw(spriteBatch, backgroundCamera - new Vector2(640, 0));
+                foreach (Sprite sprite in spriteList)
+                {
+                    sprite.Draw(spriteBatch, camera);
+                }
+
+                //player.drawCollisionBox(spriteBatch, lmContent, camera);
+
+                foreach (Sprite addition in spritesToAdd)
+                    spriteList.Add(addition);
+                spritesToAdd.Clear();
+
+                foreach (Sprite removed in spritesToRemove)
+                    spriteList.Remove(removed);
+                spritesToRemove.Clear();
             }
-                
-            //player.drawCollisionBox(spriteBatch, lmContent, camera);
+            else if (levelState == LevelState.NextLevel || levelState == LevelState.Restarting)
+            {
+                background.Draw(spriteBatch, backgroundCamera);
+                background.Draw(spriteBatch, backgroundCamera + new Vector2(640, 0));
+                background.Draw(spriteBatch, backgroundCamera - new Vector2(640, 0));
+                foreach (Sprite sprite in spriteList)
+                {
+                    sprite.Draw(spriteBatch, camera);
+                }
 
-            foreach (Sprite addition in spritesToAdd)
-                spriteList.Add(addition);
-            spritesToAdd.Clear();
+                //player.drawCollisionBox(spriteBatch, lmContent, camera);
 
-            foreach (Sprite removed in spritesToRemove)
-                spriteList.Remove(removed);
-            spritesToRemove.Clear();
+                foreach (Sprite addition in spritesToAdd)
+                    spriteList.Add(addition);
+                spritesToAdd.Clear();
+
+                foreach (Sprite removed in spritesToRemove)
+                    spriteList.Remove(removed);
+                spritesToRemove.Clear();
+
+                spriteBatch.Draw(blackScreen, fadeRect, fadeColor);
+            }
+            
         }
 
         public void restartLevel()
         {
-            Debug.WriteLine("restart");
             levelState = LevelState.Restarting;
-            clearLists = true;
+            fadeColor.A = 0;
+            //clearLists = true;
 
             //MediaPlayer.Stop();
             //MediaPlayer.Play(Game1.Instance().song);
         }
 
-        public void createPauseMenu()
+        public void pause()
         {
-
+            
         }
     }
 }

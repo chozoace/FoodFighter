@@ -26,7 +26,7 @@ namespace FoodFighter
             attackLength = 4;
             attackRange = 200;
             theAttack = new List<OnionAttack>();
-            attackCooldown = new Timer(2000);
+            attackCooldown = new Timer(2500);
             canUpdate = false;
 
             idleAnim = "Enemy/OnionIdleRight";
@@ -198,7 +198,6 @@ namespace FoodFighter
         public override void attack()//initial attack
         {
             //animation
-            Debug.WriteLine("initial attack");
             if (facing == 1)
                 currentAnimation = attackLeftAnim;
             else if(facing == 0)
@@ -212,7 +211,6 @@ namespace FoodFighter
         {
             if (canLoop && enemyState != EnemyState.Hitstun)
             {
-                Debug.WriteLine("from attack loop");
                 attack();
             }
             canLoop = false;
@@ -244,7 +242,6 @@ namespace FoodFighter
 
             if (currentFrame >= attackLength)
             {
-                Debug.WriteLine("animation resetted");
                 canLoop = true;
                 canAttack = true;
                 if (facing == 1)

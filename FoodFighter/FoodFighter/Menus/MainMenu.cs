@@ -25,6 +25,8 @@ namespace FoodFighter
             myTexture = "Menus/mainMenu";
             texture = content.Load<Texture2D>(myTexture);
             visible = true;
+            width = 640;
+            height = 480;
         }
 
         public override void Update()

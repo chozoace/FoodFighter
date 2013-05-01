@@ -17,6 +17,7 @@ namespace FoodFighter
     class MoveableObject : Sprite
     {
         public int health = 1;
+        protected int maxHealth;
         protected bool controlsLocked = false;
         protected int maxSpeed;
         public int facing;
@@ -28,7 +29,7 @@ namespace FoodFighter
         protected float YVelocity;
         protected List<Wall> wallList;
         public virtual Rectangle UpperBox { get { return new Rectangle((int)position.X + 16, (int)position.Y + 8, 16, 10); } }
-        public virtual Rectangle BottomBox { get { return new Rectangle((int)position.X + 16, (int)position.Y + 49, 32, 16); } }
+        public virtual Rectangle BottomBox { get { return new Rectangle((int)position.X + 16, (int)position.Y + 64, 32, 1); } }
         public virtual Rectangle RightBox { get { return new Rectangle((int)position.X + 50, (int)position.Y + 18, 10, 32); } }
         public virtual Rectangle LeftBox { get { return new Rectangle((int)position.X + 0, (int)position.Y + 18, 10, 32); } }
         public float XSpeed { get { return speed.X; } }
@@ -53,24 +54,24 @@ namespace FoodFighter
         public bool hitstun = false;//dictates invin time, player cant be comboed so it only uses hitstun
         protected Timer hitstunTimer = new Timer();
 
-        int debugCounter = 0;
-        int debugCounter2 = 0;
-
         public void UpdateAnimation(object sender, ElapsedEventArgs e)
         {
-            currentFrame = animationRect.X / 64;
-            totalFrames = (texture.Width / 64) - 1;
+            if (Game1.Instance().gameState == Game1.GameState.Gameplay)
+            {
+                currentFrame = animationRect.X / 64;
+                totalFrames = (texture.Width / 64) - 1;
 
-            if (currentFrame >= totalFrames)
-            {
-                //startover
-                //currentFrame = 0;
-                animationRect = new Rectangle(0, 0, width, height);
-            }
-            else
-            {
-                //continue
-                animationRect = new Rectangle((currentFrame + 1) * 64, 0, width, height);
+                if (currentFrame >= totalFrames)
+                {
+                    //startover
+                    //currentFrame = 0;
+                    animationRect = new Rectangle(0, 0, width, height);
+                }
+                else
+                {
+                    //continue
+                    animationRect = new Rectangle((currentFrame + 1) * 64, 0, width, height);
+                }
             }
         }
 

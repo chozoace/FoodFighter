@@ -11,6 +11,7 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Media;
 using System.Timers;
+using System.Media;
 
 namespace FoodFighter
 {
@@ -36,10 +37,12 @@ namespace FoodFighter
         protected bool isEnemyAttack;
         protected bool isGrab = false;
         protected bool inChain = false;
+        protected SoundEffect powSound;
+        protected SoundEffectInstance powSoundInstance;
 
         public Hitbox()
         {
-
+            powSound = Game1.Instance().Content.Load<SoundEffect>("Music/Pow");
         }
 
         protected void createAttack()
@@ -76,7 +79,6 @@ namespace FoodFighter
 
         protected void unlockControls(object sender, ElapsedEventArgs e)
         {
-            Debug.WriteLine("recovered");
             LevelManager.Instance().player.unlockPlayerControls();
 
             if(LevelManager.Instance().player.myState != Player.PlayerState.Hitstun) //if player is currently not being hit, unlock controls
@@ -126,6 +128,7 @@ namespace FoodFighter
                     visible = false;
                     //removeAttack();
                     player.startHitstun(stunTime);
+                    powSound.Play();
                 }
             }
 
@@ -140,6 +143,7 @@ namespace FoodFighter
                 enemy.hitBoxCollide(stunTime);
                 enemy.health -= damage;
                 canDamage = false;
+                powSound.Play();
             }
             else
             {
@@ -151,6 +155,7 @@ namespace FoodFighter
                 enemy.hitBoxCollide(stunTime);
                 enemy.health -= damage;
                 canDamage = false;
+                powSound.Play();
             }
         }
 

@@ -19,6 +19,7 @@ namespace FoodFighter
         ContentManager content = Game1.Instance().getContent();
 
         public EnemyMeleeAttack(int x, int y, int facing)
+            : base()
         {
             visible = false;
             isEnemyAttack = true;
@@ -49,7 +50,7 @@ namespace FoodFighter
             width = 30;
             height = 10;
             texture = content.Load<Texture2D>("LevelObjects/Block2");
-            damage = 50;
+            damage = 20;
 
             //after startup create attack
             startupTimer.Elapsed += new ElapsedEventHandler(createAttack);

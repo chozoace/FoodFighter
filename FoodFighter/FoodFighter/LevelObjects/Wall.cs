@@ -15,12 +15,12 @@ namespace FoodFighter
 {
     class Wall : Sprite
     {
-        Rectangle boundingBox;
-        bool isVisible = true;
-        ContentManager content;
+        protected Rectangle boundingBox;
+        protected bool isVisible = true;
+        protected ContentManager content;
         public int imageId;
 
-        public Wall(Vector2 Position, int theWidth, int theHeight, int id)
+        public Wall(Vector2 Position, int theWidth, int theHeight, int id = 0, string texImage = "")
         {
             // isVisible = Visible;
             position = Position;
@@ -29,6 +29,12 @@ namespace FoodFighter
             getContent();
             imageId = id;
             boundingBox = new Rectangle((int)position.X, (int)position.Y, width, height);//this is needed to draw
+            name = "Wall";
+
+            if (texImage != "")
+            {
+                texture = content.Load<Texture2D>(texImage);
+            }
         }
 
         public void getContent()

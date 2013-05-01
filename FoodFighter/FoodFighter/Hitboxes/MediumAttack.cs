@@ -16,8 +16,10 @@ namespace FoodFighter
 {
     class MediumAttack : Hitbox
     {
-        public MediumAttack(int x, int y, ContentManager content, int facing)
+        bool isLevel1;
+        public MediumAttack(int x, int y, ContentManager content, int facing, bool canPushBack)
         {
+            isLevel1 = canPushBack;
             visible = false;
             isEnemyAttack = false;
             inChain = true;
@@ -60,6 +62,51 @@ namespace FoodFighter
             //after recovery restore controls
             recoveryTimer.Elapsed += new ElapsedEventHandler(unlockControls);
             recoveryTimer.Enabled = true;
+        }
+
+        public override void onHitboxHit(Enemy enemy)
+        {
+            if (isLevel1)
+            {
+                stunTime = 1200;
+                if (enemy.enemyState != Enemy.EnemyState.Hitstun)
+                {
+                    enemy.hitBoxCollide(stunTime);
+                    enemy.health -= damage;
+                    enemy.position.Y -= 4;
+                    //enemy.speed.Y = -13;
+                    if (enemy.facing == 0)
+                        enemy.speed.X = -6;
+                    else
+                        enemy.speed.X = 6;
+
+                    canDamage = false;
+                    powSound.Play();
+                }
+                else
+                {
+                    //turn off timers
+                    if (enemy.comboTime != null)
+                    {
+                        enemy.comboTime.Dispose();
+                    }
+                    enemy.hitBoxCollide(stunTime);
+                    enemy.health -= damage;
+                    enemy.position.Y -= 4;
+                    //enemy.speed.Y = -13;
+                    if (enemy.facing == 0)
+                        enemy.speed.X = -6;
+                    else
+                        enemy.speed.X = 6;
+
+                    canDamage = false;
+                    powSound.Play();
+                }
+            }
+            else
+            {
+                base.onHitboxHit(enemy);
+            }
         }
 
         public override void Draw(SpriteBatch spriteBatch, Vector2 camera)

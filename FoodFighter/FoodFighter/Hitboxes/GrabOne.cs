@@ -22,7 +22,7 @@ namespace FoodFighter
         public GrabOne(int x, int y, ContentManager content, int facing)
         {
             inChain = false;
-            visible = true;
+            visible = false;
             isEnemyAttack = false;
             startup = 20;
             active = 200;
@@ -85,7 +85,6 @@ namespace FoodFighter
 
         public void startThrow(object sender, EventArgs e)
         {
-            Debug.WriteLine("here");
             enemyThrown.startThrow(damage, stunTime);
 
             throwStartup.Dispose();

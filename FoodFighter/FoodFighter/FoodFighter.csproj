@@ -120,7 +120,13 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Enemy\BoarEnemy.cs" />
+    <Compile Include="Enemy\Chicken.cs" />
     <Compile Include="Hitboxes\SpecialAttack.cs" />
+    <Compile Include="LevelObjects\HealthPickUp.cs" />
+    <Compile Include="LevelObjects\ThinFloor.cs" />
+    <Compile Include="Menus\PauseMenu.cs" />
+    <Compile Include="Player\HealthBar.cs" />
     <Compile Include="SpriteClasses\Background.cs" />
     <Compile Include="Effects\EffectController.cs" />
     <Compile Include="Effects\EffectsComponent.cs" />

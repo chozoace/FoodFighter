@@ -23,19 +23,23 @@ namespace FoodFighter
         {
             Gameplay,
             MainMenu,
-            Pause
+            Pause,
+            TutorialScreen,
+            Credits
         }
         public GameState gameState = GameState.MainMenu;//should be main menu
 
         LevelManager levelManager;
         MainMenu mainMenu;
+        PauseMenu pauseMenu;
         public static Game1 instance;
         bool singletonEnforcer = false;
 
         public bool EffectsOn = false;
         public bool usingController;
         bool songStarted = false;
-        public Song song;
+        public SoundEffect song;
+        SoundEffectInstance songInstance;
 
         public Game1()
         {
@@ -43,7 +47,7 @@ namespace FoodFighter
             Content.RootDirectory = "Content";
             graphics.PreferredBackBufferHeight = 480;
             graphics.PreferredBackBufferWidth = 640;
-            //graphics.IsFullScreen = true;
+            graphics.IsFullScreen = true;
             effect = new EffectComponent(this);
             controlEffects = new EffectController();
             Components.Add(effect);
@@ -59,18 +63,20 @@ namespace FoodFighter
 
         protected override void Initialize()
         {
-            IsMouseVisible = true;
+            IsMouseVisible = false;
             mainMenu = new MainMenu();
+            pauseMenu = new PauseMenu();
             levelManager = new LevelManager(Content, spriteBatch);
-            
-
+           
             base.Initialize();    
         }
 
         protected override void LoadContent()
         {
             spriteBatch = new SpriteBatch(GraphicsDevice);
-            song = Content.Load<Song>("Music/EpicSong");
+            song = Content.Load<SoundEffect>("Music/EpicSong");
+            songInstance = song.CreateInstance();
+            songInstance.IsLooped = true;
         }
 
         protected override void UnloadContent()
@@ -89,7 +95,7 @@ namespace FoodFighter
 
                 if (!songStarted)
                 {
-                    MediaPlayer.Play(song);
+                    songInstance.Play();
                     songStarted = true;
                 }
             }
@@ -99,7 +105,7 @@ namespace FoodFighter
             }
             else if (gameState == GameState.Pause)
             {
-
+                pauseMenu.Update();
             }
 
 
@@ -108,6 +114,20 @@ namespace FoodFighter
                 controlEffects.Update();
 
             base.Update(gameTime);
+        }
+
+        public void pause()
+        {
+            if (gameState == GameState.Gameplay)
+            {
+                pauseMenu.visible = true;
+                gameState = GameState.Pause;
+            }
+            else if (gameState == GameState.Pause)
+            {
+                pauseMenu.visible = false;
+                gameState = GameState.Gameplay;
+            }
         }
 
         public ContentManager getContent()
@@ -141,6 +161,11 @@ namespace FoodFighter
                 {
                     mainMenu.Draw(spriteBatch);
                 }
+                else if (gameState == GameState.Pause)
+                {
+                    levelManager.drawGame(spriteBatch);
+                    pauseMenu.Draw(spriteBatch);
+                }
 
                 spriteBatch.End();
 
@@ -160,6 +185,11 @@ namespace FoodFighter
                 else if (gameState == GameState.MainMenu)
                 {
                     mainMenu.Draw(spriteBatch);
+                }
+                else if (gameState == GameState.Pause)
+                {
+                    levelManager.drawGame(spriteBatch);
+                    pauseMenu.Draw(spriteBatch);
                 }
 
                 spriteBatch.End();

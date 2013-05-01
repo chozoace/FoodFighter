@@ -25,6 +25,7 @@ namespace FoodFighter
         public override Rectangle hitBox { get { return new Rectangle((int)(position.X), (int)(position.Y), width, height); } }
 
         public OnionAttack(int x, int y, int facing)
+            : base()
         {
             fac = facing;
 
@@ -43,9 +44,8 @@ namespace FoodFighter
             width = 21;
             height = 13;
             texture = content.Load<Texture2D>("Enemy/onion");
-            damage = 50;
+            damage = 20;
 
-            Debug.WriteLine("onion created " + facing);
             createAttack();
         }
 
@@ -74,7 +74,6 @@ namespace FoodFighter
             {
                 if(hitBox.Intersects(wall.BoundingBox))
                 {
-                    Debug.WriteLine("removed");
                     //removeAttack();
                     visible = false;
                 }

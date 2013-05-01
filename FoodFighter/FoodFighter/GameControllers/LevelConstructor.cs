@@ -91,12 +91,10 @@ namespace FoodFighter
             if (!loadBackground)
             {
                 numberOfTiles = mapData.FirstChild.NextSibling.NextSibling.FirstChild.ChildNodes.Count;
-                Debug.WriteLine("here");
             }
             else
             {
                 numberOfTiles = mapData.FirstChild.NextSibling.NextSibling.NextSibling.FirstChild.ChildNodes.Count;
-                Debug.WriteLine("now here");
             }
             mapWidth = int.Parse(mapData.Attributes.GetNamedItem("width").Value);
             mapHeight = int.Parse(mapData.Attributes.GetNamedItem("height").Value);
@@ -129,6 +127,7 @@ namespace FoodFighter
         {
             Wall theWall;
             Enemy enemy;
+            Sprite theObject;
 
             for (int spriteforX = 0; spriteforX < mapWidth; spriteforX++)
             {
@@ -173,6 +172,17 @@ namespace FoodFighter
                             LevelManager.Instance().addToEnemyList(enemy);
                             LevelManager.Instance().addToSpriteList(enemy);
                             break;
+                        case 8:
+                            theWall = new ThinFloor(new Vector2(destX, destY), tileWidth, tileHeight, 9, "LevelObjects/ThinFloor");
+                            walls.Add(theWall);
+                            LevelManager.Instance().addToSpriteList(theWall);
+                            break;
+                        case 9:
+                            theObject = new HealthPickUp(new Vector2(destX, destY));
+                            LevelManager.Instance().addToSpriteList(theObject);
+                            break;
+                        case 10:
+                            break;
                     }
                 }
             }
@@ -195,31 +205,31 @@ namespace FoodFighter
 
                     switch (getTileAt(spriteforX, spriteForY))
                     {
-                        case 9:
+                        case 11:
                             theSprite = new Sprite("Buildings/build1", destX, destY);
                             LevelManager.Instance().addToSpriteList(theSprite);
                             break;
-                        case 10:
+                        case 12:
                             theSprite = new Sprite("Buildings/build2", destX, destY);
                             LevelManager.Instance().addToSpriteList(theSprite);
                             break;
-                        case 11:
+                        case 13:
                             theSprite = new Sprite("Buildings/build3", destX, destY);
                             LevelManager.Instance().addToSpriteList(theSprite);
                             break;
-                        case 12:
+                        case 14:
                             theSprite = new Sprite("Buildings/build4", destX, destY);
                             LevelManager.Instance().addToSpriteList(theSprite);
                             break;
-                        case 13:
+                        case 15:
                             theSprite = new Sprite("Buildings/build5", destX, destY);
                             LevelManager.Instance().addToSpriteList(theSprite);
                             break;
-                        case 14:
+                        case 16:
                             theSprite = new Sprite("Buildings/build6", destX, destY);
                             LevelManager.Instance().addToSpriteList(theSprite);
                             break;
-                        case 15:
+                        case 17:
                             theSprite = new Sprite("Buildings/build7", destX, destY);
                             LevelManager.Instance().addToSpriteList(theSprite);
                             break;

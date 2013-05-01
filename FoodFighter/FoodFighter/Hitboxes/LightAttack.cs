@@ -16,7 +16,7 @@ namespace FoodFighter
 {
     class LightAttack : Hitbox
     {
-        public LightAttack(int x, int y, ContentManager content, int facing)
+        public LightAttack(int x, int y, ContentManager content, int facing) :base()
         {
             visible = false;
             isEnemyAttack = false;

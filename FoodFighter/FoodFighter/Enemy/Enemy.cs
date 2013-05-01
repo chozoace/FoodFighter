@@ -61,7 +61,7 @@ namespace FoodFighter
             animTimer.Elapsed += new ElapsedEventHandler(UpdateAnimation);
             animTimer.Enabled = true;
 
-            Debug.WriteLine("currentanim " + currentAnimation + " animationrect " + animationRect);
+            //Debug.WriteLine("currentanim " + currentAnimation + " animationrect " + animationRect);
 
             enemyState = EnemyState.Idle;
         }
@@ -135,7 +135,6 @@ namespace FoodFighter
             if (this.enemyState != EnemyState.Hitstun)
             {
                 this.enemyState = EnemyState.Hitstun;
-                Debug.WriteLine("hitstun");
                 startComboStun(stunTime);
             }
             else
@@ -153,7 +152,6 @@ namespace FoodFighter
 
         public void endComboStun(object sender, ElapsedEventArgs e)
         {
-            Debug.WriteLine("endComboStun");
             if (comboTime != null)
             {
                 comboTime.Dispose();

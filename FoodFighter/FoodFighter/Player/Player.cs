@@ -11,6 +11,8 @@ using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Media;
 using System.Timers;
+using System.Xml;
+using System.Media;
 
 namespace FoodFighter
 {
@@ -36,13 +38,16 @@ namespace FoodFighter
             Idle,
             Attacking,
             Dead,
-            Hitstun
+            Hitstun,
+            AirAttack
         }
         public PlayerState myState, previousState;
         KeyboardState myKeyState, previousKeyState;
         GamePadState previousButtonState;
         public Rectangle healthBar { get { return new Rectangle((int)(position.X - 290), (int)(position.Y - 200), 250, 80); } }
+        HealthBar myHealth;
         public HUD hud;
+        
 
         //////////
         //X Move variables
@@ -51,12 +56,15 @@ namespace FoodFighter
         bool rightMove = false;
         bool upMove = false;
         float runningDecelRate = 5f;
+
+        int maxSpeedLevel2 = 10;
         //////////
         //Jump variables
         //////////
         bool canUpPress = true;
         int jumpSpeedLimit = 10;//???
         int jumpSpeed = -13;//-15
+        int jumpSpeedLevel2 = -18;
         int fallSpeed = 10;
         int wallJumpSpeed = -8;
         int doubleJumpSpeed = -9;
@@ -74,6 +82,7 @@ namespace FoodFighter
         bool canJpress = true;
         bool canKpress = true;
         bool canLpress = true;
+        string attackType = "";
         //////////
         //Animation variables
         //////////
@@ -83,8 +92,20 @@ namespace FoodFighter
         String midLeft;
         String heavyRight;
         String heavyLeft;
+        String airAttackLeft;
+        String airAttackRight;
+        String groundHeavyRight;
+        String groundHeavyLeft;
+        String throwRight;
+        String throwLeft;
 
         GamePadState padState;
+        XmlDocument myStats;
+        int firstTransformThreshold = 60;
+        SoundEffect levelUpSound;
+        SoundEffectInstance levelUpSoundInstance;
+
+        Timer passableTimer;
 
         public Player(Vector2 newPos)
         {
@@ -95,11 +116,31 @@ namespace FoodFighter
             hud.Score = 0;
             gravity = 1f;
 
-            health = 400;
+            myHealth = new HealthBar();
+
+            myStats = new XmlDocument();
+            myStats.Load("Content/XML/PlayerSample.xml");
+            XmlNode playerNode = myStats.FirstChild;
+
+            maxSpeed = int.Parse(playerNode.Attributes.GetNamedItem("maxSpeed").Value);
+            //accelRate = 0.8f;
+            accelRate = float.Parse(playerNode.Attributes.GetNamedItem("accelRate").Value);
+            //decelRate = 1.8f;
+            decelRate = float.Parse(playerNode.Attributes.GetNamedItem("decelRate").Value);
+            fallSpeed = int.Parse(playerNode.Attributes.GetNamedItem("fallSpeed").Value);
+            gravity = float.Parse(playerNode.Attributes.GetNamedItem("gravity").Value);
+            jumpSpeed = int.Parse(playerNode.Attributes.GetNamedItem("jumpSpeed").Value);
+            maxSpeedLevel2 = int.Parse(playerNode.Attributes.GetNamedItem("maxSpeedLevel2").Value);
+            jumpSpeedLevel2 = int.Parse(playerNode.Attributes.GetNamedItem("jumpSpeedLevel2").Value);
+            firstTransformThreshold = int.Parse(playerNode.Attributes.GetNamedItem("firstTransformThreshold").Value);
+            //hud.Score = 60;
+
+            maxHealth = 100;
+            health = maxHealth;
             height = 64;
             width = 64;
             position = newPos;
-            maxSpeed = 8;
+            //maxSpeed = 8;
             speed = new Vector2(0, 0);
             accelRate = 0.8f;
             decelRate = 1.8f;
@@ -111,14 +152,20 @@ namespace FoodFighter
             runLeftAnim = "Player/HeroWalkLeft";
             lightRight = "Player/HeroLightRight";
             lightLeft = "Player/HeroLightLeft";
-            midRight = "robo_running";
-            midLeft = "robo_running_left";
+            midRight = "Player/midChainRight";
+            midLeft = "Player/midChainLeft";
             heavyRight = "Player/HeroHeavyRight";
             heavyLeft = "Player/HeroHeavyLeft";
             hurtLeft = "Player/HeroLeftHurt";
             hurtRight = "Player/HeroRightHurt";
             jumpLeft = "Player/HeroJumpLeft";
             jumpRight = "Player/HeroJumpRight";
+            airAttackLeft = "Player/HeroAirAttackLeft";
+            airAttackRight = "Player/HeroAirAttackRight";
+            groundHeavyRight = "Player/HeroAirAttackRight";
+            groundHeavyLeft = "Player/HeroAirAttackLeft";
+            throwRight = "Player/HeroGrabRight";
+            throwLeft = "Player/HeroGrabLeft";
             hitstun = false;
         }
 
@@ -130,6 +177,9 @@ namespace FoodFighter
             animTimer.Elapsed += new ElapsedEventHandler(UpdateAnimation);
             animTimer.Enabled = true;
 
+            levelUpSound = content.Load<SoundEffect>("Music/LevelUp");
+            levelUpSoundInstance = levelUpSound.CreateInstance();
+
             jumpCount = 0;
             myState = PlayerState.Idle;
             myContent = content;
@@ -137,7 +187,6 @@ namespace FoodFighter
 
         public override void Update()
         {
-            //Debug.WriteLine(myState);
             myKeyState = Keyboard.GetState();
             padState = GamePad.GetState(PlayerIndex.One);
             if (myState != PlayerState.Dead)
@@ -154,6 +203,7 @@ namespace FoodFighter
                 }
                 UpdateMovement(myKeyState);
                 UpdateTexture();
+                myHealth.Update(health);
             }
 
             if (health < 1)
@@ -162,10 +212,22 @@ namespace FoodFighter
                 controlsLocked = true;
                 death();
             }
+            else if (health > maxHealth)
+            {
+                health = maxHealth;
+            }
 
-            if (fatState == FatState.Level1 && hud.Score >= 10)
+            if (fatState == FatState.Level1 && hud.Score >= firstTransformThreshold)
             {
                 transform();
+            }
+
+            if (animTimer.Interval != 100 && (myState != PlayerState.Attacking || myState != PlayerState.AirAttack))
+            {
+                //animTimer.Dispose();
+                //animTimer = new Timer();
+                //animTimer.Elapsed += new ElapsedEventHandler(UpdateAnimation);
+                //animTimer.Enabled = true;
             }
         }
 
@@ -173,9 +235,11 @@ namespace FoodFighter
         {
             if (fatState == FatState.Level1)
             {
+                levelUpSoundInstance.Play();
+
                 fatState = FatState.Level2;
-                jumpSpeed = -18;
-                maxSpeed = 10; 
+                jumpSpeed = jumpSpeedLevel2;
+                maxSpeed = maxSpeedLevel2; 
 
                 idleAnim = "Player/Level2/HeroIdleRight";
                 idleLeftAnim = "Player/Level2/HeroIdleLeft";
@@ -183,14 +247,17 @@ namespace FoodFighter
                 runLeftAnim = "Player/Level2/HeroWalkLeft";
                 lightRight = "Player/Level2/HeroLightRight";
                 lightLeft = "Player/Level2/HeroLightLeft";
-                midRight = "robo_running";
-                midLeft = "robo_running_left";
+                midRight = "Player/Level2/midChainRight";
+                midLeft = "Player/Level2/midChainLeft";
                 heavyRight = "Player/Level2/HeroHeavyRight";
                 heavyLeft = "Player/Level2/HeroHeavyLeft";
                 hurtLeft = "Player/Level2/HeroLeftHurt";
                 hurtRight = "Player/Level2/HeroRightHurt";
                 jumpLeft = "Player/Level2/HeroJumpLeft";
                 jumpRight = "Player/Level2/HeroJumpRight";
+                groundHeavyLeft = "Player/Level2/groundHeavyLeft";
+                groundHeavyRight = "Player/Level2/groundHeavyRight";
+
             }
             else if (fatState == FatState.Level2)
             {
@@ -214,6 +281,10 @@ namespace FoodFighter
                         animationRect = new Rectangle(0, 0, width, height);
                         texture = myContent.Load<Texture2D>(runAnim);
                         currentAnimation = runAnim;
+                        animTimer.Dispose();
+                        animTimer = new Timer(100);
+                        animTimer.Elapsed += new ElapsedEventHandler(UpdateAnimation);
+                        animTimer.Enabled = true;
 
                     }
                     else if (facing == 1 && currentAnimation != runLeftAnim)
@@ -221,6 +292,10 @@ namespace FoodFighter
                         animationRect = new Rectangle(0, 0, width, height);
                         texture = myContent.Load<Texture2D>(runLeftAnim);
                         currentAnimation = runLeftAnim;
+                        animTimer.Dispose();
+                        animTimer = new Timer(100);
+                        animTimer.Elapsed += new ElapsedEventHandler(UpdateAnimation);
+                        animTimer.Enabled = true;
                     }
                 }
                 else if (myState == PlayerState.Idle)
@@ -230,12 +305,20 @@ namespace FoodFighter
                         animationRect = new Rectangle(0, 0, width, height);
                         texture = myContent.Load<Texture2D>(idleAnim);
                         currentAnimation = idleAnim;
+                        animTimer.Dispose();
+                        animTimer = new Timer(100);
+                        animTimer.Elapsed += new ElapsedEventHandler(UpdateAnimation);
+                        animTimer.Enabled = true;
                     }
                     else if (facing == 1 && currentAnimation != idleLeftAnim)
                     {
                         animationRect = new Rectangle(0, 0, width, height);
                         texture = myContent.Load<Texture2D>(idleLeftAnim);
                         currentAnimation = idleLeftAnim;
+                        animTimer.Dispose();
+                        animTimer = new Timer(100);
+                        animTimer.Elapsed += new ElapsedEventHandler(UpdateAnimation);
+                        animTimer.Enabled = true;
                     }
                 }
                 else if (myState == PlayerState.Jumping)
@@ -245,16 +328,99 @@ namespace FoodFighter
                         animationRect = new Rectangle(0, 0, width, height);
                         texture = myContent.Load<Texture2D>(jumpRight);
                         currentAnimation = jumpRight;
+                        animTimer.Dispose();
+                        animTimer = new Timer(100);
+                        animTimer.Elapsed += new ElapsedEventHandler(UpdateAnimation);
+                        animTimer.Enabled = true;
                     }
                     else if (facing == 1 && currentAnimation != jumpLeft)
                     {
                         animationRect = new Rectangle(0, 0, width, height);
                         texture = myContent.Load<Texture2D>(jumpLeft);
                         currentAnimation = jumpLeft;
+                        animTimer.Dispose();
+                        animTimer = new Timer(100);
+                        animTimer.Elapsed += new ElapsedEventHandler(UpdateAnimation);
+                        animTimer.Enabled = true;
+                    }
+                }
+                else if (myState == PlayerState.AirAttack)
+                {
+                    if (facing == 0 && currentAnimation != airAttackRight)
+                    {
+                        animationRect = new Rectangle(0, 0, width, height);
+                        texture = myContent.Load<Texture2D>(airAttackRight);
+                        currentAnimation = airAttackRight;
+                        //animTimer.Dispose();
+                        //animTimer = new Timer(200);
+                        //animTimer.Elapsed += new ElapsedEventHandler(UpdateAnimation);
+                        //animTimer.Enabled = true;
+                    }
+                    else if (facing == 1 && currentAnimation != airAttackLeft)
+                    {
+                        animationRect = new Rectangle(0, 0, width, height);
+                        texture = myContent.Load<Texture2D>(airAttackLeft);
+                        currentAnimation = airAttackLeft;
+                        //animTimer.Dispose();
+                        //animTimer = new Timer(200);
+                        //animTimer.Elapsed += new ElapsedEventHandler(UpdateAnimation);
+                        //animTimer.Enabled = true;
                     }
                 }
                 else if (myState == PlayerState.Attacking)//light attack
                 {
+                    if (attackType == "Heavy")
+                    {
+                        if (facing == 0 && currentAnimation != groundHeavyRight)
+                        {
+                            animationRect = new Rectangle(0, 0, width, height);
+                            texture = myContent.Load<Texture2D>(groundHeavyRight);
+                            currentAnimation = groundHeavyRight;
+                            animTimer.Dispose();
+                            if (fatState == FatState.Level1)
+                                animTimer = new Timer(200);
+                            else
+                                animTimer = new Timer(80);
+                            animTimer.Elapsed += new ElapsedEventHandler(UpdateAnimation);
+                            animTimer.Enabled = true;
+                        }
+                        else if (facing == 1 && currentAnimation != groundHeavyLeft)
+                        {
+                            animationRect = new Rectangle(0, 0, width, height);
+                            texture = myContent.Load<Texture2D>(groundHeavyLeft);
+                            currentAnimation = groundHeavyLeft;
+                            animTimer.Dispose();
+                            if (fatState == FatState.Level1)
+                                animTimer = new Timer(200);
+                            else
+                                animTimer = new Timer(80);
+                            animTimer.Elapsed += new ElapsedEventHandler(UpdateAnimation);
+                            animTimer.Enabled = true;
+                        }
+                    }
+                    if (attackType == "Throw")
+                    {
+                        if (facing == 0 && currentAnimation != throwRight)
+                        {
+                            animationRect = new Rectangle(0, 0, width, height);
+                            texture = myContent.Load<Texture2D>(throwRight);
+                            currentAnimation = throwRight;
+                            animTimer.Dispose();
+                            animTimer = new Timer(200);
+                            animTimer.Elapsed += new ElapsedEventHandler(UpdateAnimation);
+                            animTimer.Enabled = true;
+                        }
+                        else if (facing == 1 && currentAnimation != throwLeft)
+                        {
+                            animationRect = new Rectangle(0, 0, width, height);
+                            texture = myContent.Load<Texture2D>(throwLeft);
+                            currentAnimation = throwLeft;
+                            animTimer.Dispose();
+                            animTimer = new Timer(200);
+                            animTimer.Elapsed += new ElapsedEventHandler(UpdateAnimation);
+                            animTimer.Enabled = true;
+                        }
+                    }
                     if (currentChain == 1)
                     {
                         if (facing == 0 && currentAnimation != lightRight)
@@ -262,12 +428,20 @@ namespace FoodFighter
                             animationRect = new Rectangle(0, 0, width, height);
                             texture = myContent.Load<Texture2D>(lightRight);
                             currentAnimation = lightRight;
+                            animTimer.Dispose();
+                            animTimer = new Timer(200);
+                            animTimer.Elapsed += new ElapsedEventHandler(UpdateAnimation);
+                            animTimer.Enabled = true;
                         }
                         else if (facing == 1 && currentAnimation != lightLeft)
                         {
                             animationRect = new Rectangle(0, 0, width, height);
                             texture = myContent.Load<Texture2D>(lightLeft);
                             currentAnimation = lightLeft;
+                            animTimer.Dispose();
+                            animTimer = new Timer(200);
+                            animTimer.Elapsed += new ElapsedEventHandler(UpdateAnimation);
+                            animTimer.Enabled = true;
                         }
                     }
                     if (currentChain == 2)
@@ -277,12 +451,20 @@ namespace FoodFighter
                             animationRect = new Rectangle(0, 0, width, height);
                             texture = myContent.Load<Texture2D>(midRight);
                             currentAnimation = midRight;
+                            animTimer.Dispose();
+                            animTimer = new Timer(220);
+                            animTimer.Elapsed += new ElapsedEventHandler(UpdateAnimation);
+                            animTimer.Enabled = true;
                         }
                         else if (facing == 1 && currentAnimation != midLeft)
                         {
                             animationRect = new Rectangle(0, 0, width, height);
                             texture = myContent.Load<Texture2D>(midLeft);
                             currentAnimation = midLeft;
+                            animTimer.Dispose();
+                            animTimer = new Timer(220);
+                            animTimer.Elapsed += new ElapsedEventHandler(UpdateAnimation);
+                            animTimer.Enabled = true;
                         }
                     }
                     if (currentChain == 3)
@@ -292,12 +474,20 @@ namespace FoodFighter
                             animationRect = new Rectangle(0, 0, width, height);
                             texture = myContent.Load<Texture2D>(heavyRight);
                             currentAnimation = heavyRight;
+                            animTimer.Dispose();
+                            animTimer = new Timer(200);
+                            animTimer.Elapsed += new ElapsedEventHandler(UpdateAnimation);
+                            animTimer.Enabled = true;
                         }
                         else if (facing == 1 && currentAnimation != heavyLeft)
                         {
                             animationRect = new Rectangle(0, 0, width, height);
                             texture = myContent.Load<Texture2D>(heavyLeft);
                             currentAnimation = heavyLeft;
+                            animTimer.Dispose();
+                            animTimer = new Timer(200);
+                            animTimer.Elapsed += new ElapsedEventHandler(UpdateAnimation);
+                            animTimer.Enabled = true;
                         }
                     }
                 }
@@ -309,12 +499,20 @@ namespace FoodFighter
                     animationRect = new Rectangle(0, 0, width, height);
                     texture = myContent.Load<Texture2D>(hurtLeft);
                     currentAnimation = hurtLeft;
+                    animTimer.Dispose();
+                    animTimer = new Timer(100);
+                    animTimer.Elapsed += new ElapsedEventHandler(UpdateAnimation);
+                    animTimer.Enabled = true;
                 }
                 else if (facing == 0 && currentAnimation != hurtRight)
                 {
                     animationRect = new Rectangle(0, 0, width, height);
                     texture = myContent.Load<Texture2D>(hurtRight);
                     currentAnimation = hurtRight;
+                    animTimer.Dispose();
+                    animTimer = new Timer(100);
+                    animTimer.Elapsed += new ElapsedEventHandler(UpdateAnimation);
+                    animTimer.Enabled = true;
                 }
             }
         }
@@ -338,12 +536,12 @@ namespace FoodFighter
         {
             if (!controlsLocked && myState != PlayerState.Hitstun)
             {
-                if (keyState.IsKeyDown(Keys.D) == true && previousKeyState.IsKeyDown(Keys.D) == true && myState != PlayerState.Attacking)
+                if (keyState.IsKeyDown(Keys.D) == true && previousKeyState.IsKeyDown(Keys.D) == true && myState != PlayerState.Attacking && myState != PlayerState.AirAttack)
                 {
                     rightMove = true;
                     facing = 0;
                 }
-                if (keyState.IsKeyDown(Keys.A) == true && previousKeyState.IsKeyDown(Keys.A) == true && myState != PlayerState.Attacking)
+                if (keyState.IsKeyDown(Keys.A) == true && previousKeyState.IsKeyDown(Keys.A) == true && myState != PlayerState.Attacking && myState != PlayerState.AirAttack)
                 {
                     leftMove = true;
                     facing = 1;
@@ -358,13 +556,29 @@ namespace FoodFighter
                         canUpPress = false;
                     }
                 }
+                if (keyState.IsKeyDown(Keys.S) == true && previousKeyState.IsKeyUp(Keys.S) == true && myState != PlayerState.Jumping)
+                {
+                    if (CheckCollision(BottomBox))
+                    {
+                        if (collidingWall.name == "ThinFloor" && collidingWall.passable == false)
+                        {
+                            collidingWall.passable = true;
+                            if(passableTimer != null)
+                                passableTimer.Dispose();
+                            passableTimer = new Timer(1000);
+                            passableTimer.Elapsed += new ElapsedEventHandler(solidifyWalls);
+                            passableTimer.Enabled = true;
+                            //myState = PlayerState.Jumping;
+                        }
+                    }
+                }
                 if (keyState.IsKeyDown(Keys.J) == true && previousKeyState.IsKeyDown(Keys.J) == true)
                 {
                     if (canAttack && CheckCollision(BottomBox) && canJpress)
                     {
+                        attackType = "Light";
                         if (currentChain == 0)
                         {
-                            Debug.WriteLine("attack");
                             currentChain = 1;
 
                             currentAccel = 0;
@@ -379,7 +593,6 @@ namespace FoodFighter
                         else if (currentChain == 1)
                         {
                             currentChain = 2;
-                            Debug.WriteLine("second Attack");
 
                             myState = PlayerState.Attacking;//just in case
                             canJpress = false;
@@ -387,14 +600,13 @@ namespace FoodFighter
 
                             if (lAttack != null)
                             {
-                                Debug.WriteLine("removing lattack");
                                 lAttack.removeTimers();
                                 lAttack.removeAttack();
                                 lAttack = null;
                             }
                             attack();
                         }
-                        else if (currentChain == 2)
+                        else if (currentChain == 2 && fatState == FatState.Level2)
                         {
                             currentChain = 3;
 
@@ -404,7 +616,6 @@ namespace FoodFighter
 
                             if (mAttack != null)
                             {
-                                Debug.WriteLine("removing mattack");
                                 mAttack.removeTimers();
                                 mAttack.removeAttack();
                                 mAttack = null;
@@ -412,17 +623,18 @@ namespace FoodFighter
                             attack();
                         }
                     }
+                    
                 }
                 if (keyState.IsKeyDown(Keys.K) == true && previousKeyState.IsKeyDown(Keys.K) == true)
                 {
                     if (CheckCollision(BottomBox) && currentChain < 1 && canAttack && canKpress)
                     {
-                        Debug.WriteLine("pressing K");
                         currentAccel = 0;
                         speed.X = 0;
                         myState = PlayerState.Attacking;
                         canAttack = false;
                         canKpress = false;
+                        attackType = "Throw";
 
                         grab();
                     }
@@ -431,19 +643,36 @@ namespace FoodFighter
                 {
                     if (CheckCollision(BottomBox) && currentChain < 1 && canAttack && canLpress)
                     {
-                        Debug.WriteLine("pressing L");
                         currentAccel = 0;
                         speed.X = 0;
                         myState = PlayerState.Attacking;
+                        attackType = "Heavy";
                         canAttack = false;
                         canLpress = false;
 
                         heavyAttack();
                     }
-                }
+                    //else if (myState == PlayerState.Jumping && currentChain < 1 && canAttack && canLpress)
+                    //{
+                    //    currentAccel = 0;
+                    //    speed.X = 0;
+                    //    speed.Y = 0;
+                    //    myState = PlayerState.AirAttack;
+                    //    canAttack = false;
+                    //    canLpress = false;
+                    //    rightMove = false;
+                    //    leftMove = false;
 
+                    //    heavyAttack();
+                    //}
+                }
+                if (keyState.IsKeyDown(Keys.P) == true && previousKeyState.IsKeyUp(Keys.P) == true)
+                {
+                    Debug.WriteLine("hdera");
+                    Game1.Instance().pause();
+                   // Game1.Instance().gameState = Game1.GameState.Pause;
+                }
             }
-            //Debug.WriteLine(myState + " " + canAttack);
             previousKeyState = keyState;
         }
 
@@ -491,7 +720,6 @@ namespace FoodFighter
                         else if (currentChain == 1)
                         {
                             currentChain = 2;
-                            Debug.WriteLine("second Attack");
 
                             myState = PlayerState.Attacking;//just in case
                             canJpress = false;
@@ -499,7 +727,6 @@ namespace FoodFighter
 
                             if (lAttack != null)
                             {
-                                Debug.WriteLine("removing lattack");
                                 lAttack.removeTimers();
                                 lAttack.removeAttack();
                                 lAttack = null;
@@ -516,7 +743,6 @@ namespace FoodFighter
 
                             if (mAttack != null)
                             {
-                                Debug.WriteLine("removing mattack");
                                 mAttack.removeTimers();
                                 mAttack.removeAttack();
                                 mAttack = null;
@@ -529,7 +755,6 @@ namespace FoodFighter
                 {
                     if (CheckCollision(BottomBox) && currentChain < 1 && canAttack && canKpress)
                     {
-                        Debug.WriteLine("pressing K");
                         currentAccel = 0;
                         speed.X = 0;
                         myState = PlayerState.Attacking;
@@ -543,7 +768,6 @@ namespace FoodFighter
                 {
                     if (CheckCollision(BottomBox) && currentChain < 1 && canAttack && canLpress)
                     {
-                        Debug.WriteLine("pressing K");
                         currentAccel = 0;
                         speed.X = 0;
                         myState = PlayerState.Attacking;
@@ -578,17 +802,39 @@ namespace FoodFighter
                 }
             }
 
-            if (!controlsLocked && myState != PlayerState.Hitstun && myState != PlayerState.Attacking)
+            if (!controlsLocked && myState != PlayerState.Hitstun && myState != PlayerState.Attacking && myState != PlayerState.AirAttack)
             {
                 if (keyState.IsKeyUp(Keys.D) == true)
                 {
                     rightMove = false;
-                    currentAccel = 0;
+
+                    if (CheckCollision(LeftBox) || CheckCollision(RightBox))
+                    {
+                        if (collidingWall.name != "ThinFloor")
+                            currentAccel = 0;
+                        if (CheckCollision(BottomBox))
+                            currentAccel = 0;
+                    }
+                    else if (CheckCollision(BottomBox))
+                    {
+                        currentAccel = 0;
+                    }
                 }
                 if (keyState.IsKeyUp(Keys.A) == true)
                 {
                     leftMove = false;
-                    currentAccel = 0;
+
+                    if (CheckCollision(LeftBox) || CheckCollision(RightBox))
+                    {
+                        if (collidingWall.name != "ThinFloor")
+                            currentAccel = 0;
+                        if (CheckCollision(BottomBox))
+                            currentAccel = 0;
+                    }
+                    else if (CheckCollision(BottomBox))
+                    {
+                        currentAccel = 0;
+                    }
                 }
                 if (keyState.IsKeyUp(Keys.W) == true)
                 {
@@ -692,7 +938,7 @@ namespace FoodFighter
 
             #region gravity
             //makes play fall off ledges when he walks off
-            if (!CheckCollision(BottomBox))
+            if (!CheckCollision(BottomBox) && myState != PlayerState.AirAttack)
             {
                 myState = PlayerState.Jumping;
             }
@@ -702,19 +948,20 @@ namespace FoodFighter
                 {
                     if (position.X < collidingWall.position.X && speed.Y > 0)
                     {
-                        //collidingWall.position.X = RightBox.X + RightBox.Width;
                         collidingWall.position.X += 15;
                     }
                     else if(position.X > collidingWall.position.X && speed.Y > 0)
                     {
-                        //collidingWall.position.X = position.X - 60;
                         collidingWall.position.X -= 15;
                     }
                 }
                 else if (speed.Y > 0)
                 {
-                    position.Y = collidingWall.BoundingBox.Y - height;
-                    speed.Y = 0;
+                    //if (collidingWall.name != "ThinFloor")
+                    //{
+                        position.Y = collidingWall.BoundingBox.Y - height;
+                        speed.Y = 0;
+                    //}
                 }
             }
 
@@ -727,8 +974,11 @@ namespace FoodFighter
 
                 if(CheckCollision(UpperBox))
                 {
-                    //position.Y = collidingWall.BoundingBox.Y + collidingWall.BoundingBox.Height;
-                    //speed.Y *= -1;
+                    if (collidingWall.name != "ThinFloor")
+                    {
+                        position.Y = collidingWall.BoundingBox.Y + collidingWall.BoundingBox.Height;
+                        speed.Y *= -1;
+                    }
                 }
             }
             #endregion
@@ -794,8 +1044,11 @@ namespace FoodFighter
             {
                 if (CheckCollision(RightBox))
                 {
-                    position.X = collidingWall.BoundingBox.X - 60;//60 is the bounding box position x + its width
-                    currentAccel = 0;
+                    if (collidingWall.name != "ThinFloor")
+                    {
+                        position.X = collidingWall.BoundingBox.X - 60;//60 is the bounding box position x + its width
+                        currentAccel = 0;
+                    }
                 }
             }
 
@@ -803,13 +1056,15 @@ namespace FoodFighter
             {
                 if (CheckCollision(LeftBox))
                 {
-                   
-                    position.X = collidingWall.BoundingBox.X + collidingWall.BoundingBox.Width;
-                    currentAccel = 0;
+                    if (collidingWall.name != "ThinFloor")
+                    {
+                        position.X = collidingWall.BoundingBox.X + collidingWall.BoundingBox.Width;
+                        currentAccel = 0;
+                    }
                 }
             }
             #endregion
-            //Debug.WriteLine(myState);
+
             previousState = myState;
             previousPosition = position;
             position += speed;
@@ -828,12 +1083,13 @@ namespace FoodFighter
             }
             else if (currentChain == 2)
             {
-                Debug.WriteLine("medium called");
-                mAttack = new MediumAttack((int)(position.X), (int)(position.Y), Game1.Instance().getContent(), facing);
+                if(fatState == FatState.Level1)
+                    mAttack = new MediumAttack((int)(position.X), (int)(position.Y), Game1.Instance().getContent(), facing, true);
+                else if(fatState == FatState.Level2)
+                    mAttack = new MediumAttack((int)(position.X), (int)(position.Y), Game1.Instance().getContent(), facing, false);
             }
             else if (currentChain == 3)
             {
-                Debug.WriteLine("heavy called");
                 hAttack = new HeavyAttack((int)(position.X), (int)(position.Y), Game1.Instance().getContent(), facing);
             }
         }
@@ -857,7 +1113,7 @@ namespace FoodFighter
             List<Enemy> enemyList = LevelManager.Instance().getEnemyList();
             foreach (Wall wall in wallList)
             {
-                if (wall.BoundingBox.Intersects(collisionBox))
+                if (wall.BoundingBox.Intersects(collisionBox) && !wall.passable)
                 {
                     collidingWall = wall;
                     return true;
@@ -875,6 +1131,16 @@ namespace FoodFighter
             return false;
         }
 
+        public void solidifyWalls(object sender, ElapsedEventArgs e)
+        {
+            wallList = LevelConstructor.Instance().getWallList();
+            foreach (Wall wall in wallList)
+            {
+                wall.passable = false;
+            }
+            passableTimer.Dispose();
+        }
+
         public override void startHitstun(int stunTime)
         {
             myState = PlayerState.Hitstun;
@@ -883,7 +1149,6 @@ namespace FoodFighter
 
         public override void endHitstun(object sender, ElapsedEventArgs e)
         {
-            Debug.WriteLine("From End");
             myState = PlayerState.Idle;
             base.endHitstun(sender, e);
         }
@@ -892,9 +1157,11 @@ namespace FoodFighter
         {
             //drawCollisionBox(spriteBatch, myContent, camera);
             Texture2D healthImage = myContent.Load<Texture2D>("Player/healthBarBig");
+
+            myHealth.Draw(spriteBatch, camera, position);
             hud.Draw(spriteBatch, camera, position);
 
-            spriteBatch.Draw(healthImage, new Rectangle((int)(healthBar.X - camera.X), (int)(healthBar.Y - camera.Y), healthBar.Width, healthBar.Height), Color.White);
+            //spriteBatch.Draw(healthImage, new Rectangle((int)(healthBar.X - camera.X), (int)(healthBar.Y - camera.Y), healthBar.Width, healthBar.Height), Color.White);
             base.Draw(spriteBatch, camera);
         }
 

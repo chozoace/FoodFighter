@@ -10,6 +10,7 @@ using Microsoft.Xna.Framework.GamerServices;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using Microsoft.Xna.Framework.Media;
+using System.Timers;
 
 namespace FoodFighter
 {
@@ -27,6 +28,13 @@ namespace FoodFighter
         protected List<Wall> wallList;
         public bool isEnemy = false;
         public virtual Rectangle BoundingBox { get { return new Rectangle((int)position.X, (int)position.Y, width, height); } }
+        public string name;
+        protected Rectangle animationRect;
+        public String currentAnimation;
+        protected int currentFrame;
+        protected int totalFrames;
+        protected Timer animTimer = new Timer();
+        public bool passable = false;
 
         public Sprite()
         {
@@ -47,6 +55,27 @@ namespace FoodFighter
         {
             //get the keystate and update movement
 
+        }
+
+        public virtual void UpdateAnimation(object sender, ElapsedEventArgs e)
+        {
+            if (Game1.Instance().gameState == Game1.GameState.Gameplay)
+            {
+                currentFrame = animationRect.X / 64;
+                totalFrames = (texture.Width / 64) - 1;
+
+                if (currentFrame >= totalFrames)
+                {
+                    //startover
+                    //currentFrame = 0;
+                    animationRect = new Rectangle(0, 0, width, height);
+                }
+                else
+                {
+                    //continue
+                    animationRect = new Rectangle((currentFrame + 1) * 64, 0, width, height);
+                }
+            }
         }
 
         public virtual void Draw(SpriteBatch spriteBatch, Vector2 camera)

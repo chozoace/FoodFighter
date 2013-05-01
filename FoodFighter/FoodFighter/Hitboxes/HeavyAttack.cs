@@ -17,6 +17,7 @@ namespace FoodFighter
     class HeavyAttack : Hitbox
     {
         public HeavyAttack(int x, int y, ContentManager content, int facing)
+            : base()
         {
             visible = false;
             isEnemyAttack = false;
@@ -76,6 +77,7 @@ namespace FoodFighter
                     enemy.speed.X = 6;
                 
                 canDamage = false;
+                powSound.Play();
             }
             else
             {
@@ -94,6 +96,7 @@ namespace FoodFighter
                     enemy.speed.X = 6;
 
                 canDamage = false;
+                powSound.Play();
             }
         }
 

@@ -17,13 +17,14 @@ namespace FoodFighter
     class SpecialAttack : Hitbox
     {
         public SpecialAttack(int x, int y, ContentManager content, int facing)
+            : base()
         {
-            visible = true;
+            visible = false;
             isEnemyAttack = false;
             inChain = false;
-            startup = 30;
+            startup = 60;
             active = 200;
-            recovery = 800;
+            recovery = 1000;
             stunTime = 1500;
             //totalFrames = 15; //what is this
             startupTimer = new Timer(startup);
@@ -64,36 +65,78 @@ namespace FoodFighter
 
         public override void onHitboxHit(Enemy enemy)
         {
-            if (enemy.enemyState != Enemy.EnemyState.Hitstun)
+            if (LevelManager.Instance().player.fatState == Player.FatState.Level1)
             {
-                enemy.hitBoxCollide(stunTime);
-                enemy.health -= damage;
-                enemy.position.Y -= 2;
-                enemy.speed.Y = -13;
-                if (enemy.facing == 0)
-                    enemy.speed.X = -6;
+                if (enemy.enemyState != Enemy.EnemyState.Hitstun)
+                {
+                    enemy.hitBoxCollide(stunTime);
+                    enemy.health -= damage;
+                    enemy.position.Y -= 2;
+                    enemy.speed.Y = -8;
+                    if (enemy.facing == 0)
+                        enemy.speed.X = -4;
+                    else
+                        enemy.speed.X = 4;
+
+                    canDamage = false;
+                    powSound.Play();
+                }
                 else
-                    enemy.speed.X = 6;
-                
-                canDamage = false;
+                {
+                    //turn off timers
+                    damage = 150;
+                    if (enemy.comboTime != null)
+                    {
+                        enemy.comboTime.Dispose();
+                    }
+                    enemy.hitBoxCollide(stunTime);
+                    enemy.health -= damage;
+                    enemy.position.Y -= 2;
+                    enemy.speed.Y = -8;
+                    if (enemy.facing == 0)
+                        enemy.speed.X = -4;
+                    else
+                        enemy.speed.X = 4;
+
+                    canDamage = false;
+                    powSound.Play();
+                }
             }
             else
             {
-                //turn off timers
-                if (enemy.comboTime != null)
+                if (enemy.enemyState != Enemy.EnemyState.Hitstun)
                 {
-                    enemy.comboTime.Dispose();
-                }
-                enemy.hitBoxCollide(stunTime);
-                enemy.health -= damage;
-                enemy.position.Y -= 2;
-                enemy.speed.Y = -13;
-                if (enemy.facing == 0)
-                    enemy.speed.X = -6;
-                else
-                    enemy.speed.X = 6;
+                    enemy.hitBoxCollide(stunTime);
+                    enemy.health -= damage;
+                    enemy.position.Y -= 2;
+                    enemy.speed.Y = -13;
+                    if (enemy.facing == 0)
+                        enemy.speed.X = -6;
+                    else
+                        enemy.speed.X = 6;
 
-                canDamage = false;
+                    canDamage = false;
+                    powSound.Play();
+                }
+                else
+                {
+                    //turn off timers
+                    if (enemy.comboTime != null)
+                    {
+                        enemy.comboTime.Dispose();
+                    }
+                    enemy.hitBoxCollide(stunTime);
+                    enemy.health -= damage;
+                    enemy.position.Y -= 2;
+                    enemy.speed.Y = -13;
+                    if (enemy.facing == 0)
+                        enemy.speed.X = -6;
+                    else
+                        enemy.speed.X = 6;
+
+                    canDamage = false;
+                    powSound.Play();
+                }
             }
         }
 
