@@ -60,7 +60,7 @@ namespace FoodFighter
         }
 
         //begin XML here
-        //public void XmlLoad(String level)
+        //public void XmlLoad(String level, bool loadBackground = true)
         //{
         //    //map, tileset and layer, data, tile 
         //    xDoc = new XmlDocument();

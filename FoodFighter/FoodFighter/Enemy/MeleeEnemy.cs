@@ -45,7 +45,8 @@ namespace FoodFighter
             width = 64;
             height = 64;
             leftDetectionBox = new Rectangle((int)(position.X - 200), (int)(position.Y), 200, 64);
-            facing = 1; 
+            facing = 1;
+            name = "burger";
 
             idleAnim = "Enemy/burgeridleright";
             idleLeftAnim = "Enemy/burgeridleleft";
@@ -261,7 +262,7 @@ namespace FoodFighter
         {
             if (enemyState == EnemyState.Running)
             {
-                if (facing == 0 && currentAnimation != runAnim)
+                if (facing == 0 && currentAnimation != runAnim && name != "Chicken")
                 {
                     animationRect = new Rectangle(0, 0, width, height);
                     texture = myContent.Load<Texture2D>(runAnim);
@@ -277,7 +278,7 @@ namespace FoodFighter
             }
             else if (enemyState == EnemyState.Idle)
             {
-                if (facing == 0 && currentAnimation != idleAnim)
+                if (facing == 0 && currentAnimation != idleAnim && name != "Chicken")
                 {
                     animationRect = new Rectangle(0, 0, width, height);
                     texture = myContent.Load<Texture2D>(idleAnim);
@@ -292,7 +293,7 @@ namespace FoodFighter
             }
             else if (enemyState == EnemyState.Hitstun)
             {
-                if (facing == 0 && currentAnimation != hurtRight)
+                if (facing == 0 && currentAnimation != hurtRight && name != "Chicken")
                 {
                     animationRect = new Rectangle(0, 0, width, height);
                     texture = myContent.Load<Texture2D>(hurtRight);

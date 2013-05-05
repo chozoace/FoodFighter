@@ -14,12 +14,12 @@ using System.Timers;
 
 namespace FoodFighter
 {
-    class Chicken : OnionEnemy
+    class ChickenAttack : OnionAttack
     {
-        public Chicken(Vector2 newPos)
-            : base(newPos)
+        public ChickenAttack(int x, int y, int facing)
+            : base(x, y, facing)
         {
-
+            texture = content.Load<Texture2D>("Enemy/Chicken/flameball");
         }
     }
 }

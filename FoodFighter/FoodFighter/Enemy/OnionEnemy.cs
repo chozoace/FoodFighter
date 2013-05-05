@@ -18,7 +18,7 @@ namespace FoodFighter
     class OnionEnemy : MeleeEnemy
     {
         List<OnionAttack> theAttack;
-        public override Rectangle BoundingBox { get { return new Rectangle((int)position.X + 25, (int)position.Y + 25, width - 35, height - 25); } }
+       // public override Rectangle BoundingBox { get { return new Rectangle((int)position.X + 25, (int)position.Y + 25, width - 35, height - 25); } }
 
         public OnionEnemy(Vector2 newPos) : base(newPos)
         {
@@ -27,7 +27,8 @@ namespace FoodFighter
             attackRange = 200;
             theAttack = new List<OnionAttack>();
             attackCooldown = new Timer(2500);
-            canUpdate = false;
+            canUpdate = false;//if false, only does update in this class and enemy class, not melee enemy
+            name = "onion";
 
             idleAnim = "Enemy/OnionIdleRight";
             idleLeftAnim = "Enemy/OnionIdleLeft";

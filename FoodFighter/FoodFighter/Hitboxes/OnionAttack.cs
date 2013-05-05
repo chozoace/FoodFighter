@@ -16,12 +16,12 @@ namespace FoodFighter
 {
     class OnionAttack : Hitbox
     {
-        float speed = 100;
-        int fac;
+        protected float speed = 100;
+        protected int fac;
         //int direction = 1;
-        float velocity;
-        GameTime gameTime = new GameTime();
-        ContentManager content = Game1.Instance().getContent();
+        protected float velocity;
+        protected GameTime gameTime = new GameTime();
+        protected ContentManager content = Game1.Instance().getContent();
         public override Rectangle hitBox { get { return new Rectangle((int)(position.X), (int)(position.Y), width, height); } }
 
         public OnionAttack(int x, int y, int facing)

@@ -187,9 +187,16 @@ namespace FoodFighter
             else if (player.position.X > position.X)
             {
                 facing = 0;
-                if (player.position.X - (position.X) < detectionRange)
+                if (name != "Chicken")
                 {
-                    return true;
+                    if (player.position.X - (position.X) < detectionRange)
+                    {
+                        return true;
+                    }
+                }
+                else
+                {
+                    return false;
                 }
             }
             

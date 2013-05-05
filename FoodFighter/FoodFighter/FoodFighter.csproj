@@ -121,7 +121,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Enemy\BoarEnemy.cs" />
-    <Compile Include="Enemy\Chicken.cs" />
+    <Compile Include="Enemy\ChickenEnemy.cs" />
+    <Compile Include="Hitboxes\ChickenAttack.cs" />
     <Compile Include="Hitboxes\SpecialAttack.cs" />
     <Compile Include="LevelObjects\HealthPickUp.cs" />
     <Compile Include="LevelObjects\ThinFloor.cs" />

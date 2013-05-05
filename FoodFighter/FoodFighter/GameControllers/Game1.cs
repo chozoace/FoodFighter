@@ -47,7 +47,7 @@ namespace FoodFighter
             Content.RootDirectory = "Content";
             graphics.PreferredBackBufferHeight = 480;
             graphics.PreferredBackBufferWidth = 640;
-            graphics.IsFullScreen = true;
+            //graphics.IsFullScreen = true;
             effect = new EffectComponent(this);
             controlEffects = new EffectController();
             Components.Add(effect);

@@ -536,6 +536,10 @@ namespace FoodFighter
         {
             if (!controlsLocked && myState != PlayerState.Hitstun)
             {
+                if (keyState.IsKeyDown(Keys.Escape) == true && previousKeyState.IsKeyDown(Keys.Escape) == true)
+                {
+                    Game1.Instance().Exit();
+                }
                 if (keyState.IsKeyDown(Keys.D) == true && previousKeyState.IsKeyDown(Keys.D) == true && myState != PlayerState.Attacking && myState != PlayerState.AirAttack)
                 {
                     rightMove = true;
