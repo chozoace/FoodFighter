@@ -20,7 +20,7 @@ namespace FoodFighter
         protected ContentManager content;
         public int imageId;
 
-        public Wall(Vector2 Position, int theWidth, int theHeight, int id = 0, string texImage = "")
+        public Wall(Vector2 Position, int theWidth, int theHeight, int id = 0, string texImage = "", string objName = "Wall")
         {
             // isVisible = Visible;
             position = Position;
@@ -29,7 +29,7 @@ namespace FoodFighter
             getContent();
             imageId = id;
             boundingBox = new Rectangle((int)position.X, (int)position.Y, width, height);//this is needed to draw
-            name = "Wall";
+            name = objName;
 
             if (texImage != "")
             {
@@ -61,7 +61,7 @@ namespace FoodFighter
                         break;
 
                     case 3:
-                        texture = content.Load<Texture2D>("LevelObjects/Block3");
+                        texture = content.Load<Texture2D>("LevelObjects/spike");
                         break;
 
                     case 4:

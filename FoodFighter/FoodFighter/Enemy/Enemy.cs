@@ -45,10 +45,12 @@ namespace FoodFighter
         int damageToBeApplied;
         int stunTimeToBeApplied;
         bool assignGravity = true; //TEMPORARY
+        protected SoundEffect deathSound;
+        protected SoundEffect deathSoundInstance;
 
         public Enemy()
         {
-           
+            deathSound = Game1.Instance().Content.Load<SoundEffect>("Music/death2");
         }
 
         public virtual void LoadContent()
@@ -160,10 +162,11 @@ namespace FoodFighter
             }
         }
 
-        public void death()
+        public virtual void death()
         {
             LevelManager.Instance().player.hud.Score += scoreAward;
             //do some animation then timer in death
+            deathSound.Play();
 
             LevelManager.Instance().removefromSpriteList(this);
             LevelManager.Instance().removefromEnemyList(this);

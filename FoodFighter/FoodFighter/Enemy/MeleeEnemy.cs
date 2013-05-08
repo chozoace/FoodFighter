@@ -18,13 +18,13 @@ namespace FoodFighter
     {
         protected ContentManager myContent = Game1.Instance().getContent();
 
-        protected int attackLength = 5; // total number of frames in attack
+        protected int attackLength = 6; // total number of frames in attack
         protected int attackRange;
 
         protected int fallspeed = 10;
         protected int Xspeed = 4;
 
-        protected Timer attackCooldown = new Timer(1000);
+        protected Timer attackCooldown = new Timer(1200);
         protected Timer activeTimer;
         public override Rectangle BoundingBox { get { return new Rectangle((int)position.X + 25, (int)position.Y + 25, width - 45, height - 25); } }
         public Rectangle AttackBox { get { return new Rectangle((int)position.X - 5, (int)position.Y + 10, width + 10, height - 10); } }
@@ -41,7 +41,7 @@ namespace FoodFighter
             position = newPos;
             //speed.X = 4;
             attackRange = 40;
-            health = 350;
+            health = 250;
             width = 64;
             height = 64;
             leftDetectionBox = new Rectangle((int)(position.X - 200), (int)(position.Y), 200, 64);
@@ -63,6 +63,18 @@ namespace FoodFighter
         public override void LoadContent()
         {
             base.LoadContent();
+        }
+
+        public override void death()
+        {
+            if (theAttack != null)
+            {
+                theAttack.removeTimers();
+                theAttack.removeAttack();
+                theAttack = null;
+                activeTimer.Dispose();
+            }
+            base.death();
         }
 
         public override void Update()
@@ -108,7 +120,13 @@ namespace FoodFighter
 
                 if (enemyState == EnemyState.Hitstun)
                 {
-
+                    if (theAttack != null)
+                    {
+                        theAttack.removeTimers();
+                        theAttack.removeAttack();
+                        theAttack = null;
+                        activeTimer.Dispose();
+                    }
                 }
             }
             base.Update();
@@ -137,7 +155,7 @@ namespace FoodFighter
                     {
                         enemyState = EnemyState.Attacking;
                         //currentEvent = new EventHandler(attackEvent);
-                        //attack();
+                        attack();
                     }
                 }
                 if (facing == 0)
@@ -157,7 +175,7 @@ namespace FoodFighter
                     {
                         enemyState = EnemyState.Attacking;
                         //currentEvent = new EventHandler(attackEvent);
-                        //attack();
+                        attack();
                     }
                 }
             }
@@ -230,7 +248,18 @@ namespace FoodFighter
             }
             else
             {
-                if (collidingWall != LevelManager.Instance().player)
+                if (collidingWall.isEnemy)
+                {
+                    if (position.X < collidingWall.position.X && speed.Y > 0)
+                    {
+                        collidingWall.position.X += 15;
+                    }
+                    else if (position.X > collidingWall.position.X && speed.Y > 0)
+                    {
+                        collidingWall.position.X -= 15;
+                    }
+                }
+                else if (collidingWall != LevelManager.Instance().player)
                 {
                     position.Y = collidingWall.BoundingBox.Y - height;
                     applyGravity = false;
@@ -312,6 +341,19 @@ namespace FoodFighter
         {
             Player player = LevelManager.Instance().player;
             List<Enemy> enemyList = LevelManager.Instance().getEnemyList();
+            wallList = LevelConstructor.Instance().getWallList();
+            foreach (Wall wall in wallList)
+            {
+                if (wall.BoundingBox.Intersects(collisionBox))
+                {
+                    collidingWall = wall;
+                    if (wall.name == "DeathBlock")
+                    {
+                        death();
+                    }
+                    return true;
+                }
+            }
             foreach (Enemy enemy in enemyList)
             {
                 if (collisionBox.Intersects(enemy.BoundingBox) && enemy != this)
@@ -412,11 +454,13 @@ namespace FoodFighter
                     canAttack = false;
                 }
             }
-            if (currentFrame >= 1)//may need to make recovery
+            if (currentFrame >= attackLength)//may need to make recovery
             {
                 //loop attack
                 if (facing == 1)
                 {
+                    if (theAttack != null)
+                        theAttack.removeAttack();
                     canLoop = true;
                     canAttack = true;
                     currentAnimation = idleLeftAnim;
@@ -427,6 +471,8 @@ namespace FoodFighter
                 }
                 else if (facing == 0)
                 {
+                    if (theAttack != null)
+                        theAttack.removeAttack();
                     canLoop = true;
                     canAttack = true;
                     currentAnimation = idleAnim;
@@ -440,6 +486,8 @@ namespace FoodFighter
 
         public void removeAttack(object sender, ElapsedEventArgs e)
         {
+            theAttack.removeTimers();
+            theAttack.removeAttack();
             theAttack = null;
             activeTimer.Dispose();
         }

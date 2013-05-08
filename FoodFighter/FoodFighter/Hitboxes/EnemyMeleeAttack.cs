@@ -23,10 +23,10 @@ namespace FoodFighter
         {
             visible = false;
             isEnemyAttack = true;
-            startup = 50;
-            active = 200;
-            recovery = 300;
-            stunTime = 500;
+            startup = 300;
+            active = 70;
+            recovery = 500;
+            stunTime = 400;
             knockBackSpeed = new Vector2(5, 0);
             totalFrames = 15;
             startupTimer = new Timer(startup);

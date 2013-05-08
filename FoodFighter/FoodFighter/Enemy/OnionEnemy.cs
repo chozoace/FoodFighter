@@ -18,10 +18,11 @@ namespace FoodFighter
     class OnionEnemy : MeleeEnemy
     {
         List<OnionAttack> theAttack;
-       // public override Rectangle BoundingBox { get { return new Rectangle((int)position.X + 25, (int)position.Y + 25, width - 35, height - 25); } }
+        public override Rectangle BoundingBox { get { return new Rectangle((int)position.X + 25, (int)position.Y + 25, width - 35, height - 25); } }
 
         public OnionEnemy(Vector2 newPos) : base(newPos)
         {
+            health = 200;
             scoreAward = 40;
             attackLength = 4;
             attackRange = 200;

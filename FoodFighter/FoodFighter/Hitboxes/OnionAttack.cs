@@ -16,7 +16,7 @@ namespace FoodFighter
 {
     class OnionAttack : Hitbox
     {
-        protected float speed = 100;
+        protected float speed = 70;
         protected int fac;
         //int direction = 1;
         protected float velocity;

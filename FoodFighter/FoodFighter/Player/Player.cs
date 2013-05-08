@@ -56,6 +56,7 @@ namespace FoodFighter
         bool rightMove = false;
         bool upMove = false;
         float runningDecelRate = 5f;
+        
 
         int maxSpeedLevel2 = 10;
         //////////
@@ -65,6 +66,10 @@ namespace FoodFighter
         int jumpSpeedLimit = 10;//???
         int jumpSpeed = -13;//-15
         int jumpSpeedLevel2 = -18;
+        float gravityLevel2;
+        int fallSpeedLevel2;
+        float accelRateLevel2;
+        float decelRateLevel2;
         int fallSpeed = 10;
         int wallJumpSpeed = -8;
         int doubleJumpSpeed = -9;
@@ -83,6 +88,7 @@ namespace FoodFighter
         bool canKpress = true;
         bool canLpress = true;
         string attackType = "";
+        public bool canChain = false;
         //////////
         //Animation variables
         //////////
@@ -102,6 +108,7 @@ namespace FoodFighter
         GamePadState padState;
         XmlDocument myStats;
         int firstTransformThreshold = 60;
+        int secondTransformThreshold;
         SoundEffect levelUpSound;
         SoundEffectInstance levelUpSoundInstance;
 
@@ -123,17 +130,19 @@ namespace FoodFighter
             XmlNode playerNode = myStats.FirstChild;
 
             maxSpeed = int.Parse(playerNode.Attributes.GetNamedItem("maxSpeed").Value);
-            //accelRate = 0.8f;
-            accelRate = float.Parse(playerNode.Attributes.GetNamedItem("accelRate").Value);
-            //decelRate = 1.8f;
-            decelRate = float.Parse(playerNode.Attributes.GetNamedItem("decelRate").Value);
+            accelRate = float.Parse(playerNode.Attributes.GetNamedItem("accelRate").Value); //0.8
+            accelRateLevel2 = float.Parse(playerNode.Attributes.GetNamedItem("accelRateLevel2").Value);
+            decelRate = float.Parse(playerNode.Attributes.GetNamedItem("decelRate").Value);//1.8
+            decelRateLevel2 = float.Parse(playerNode.Attributes.GetNamedItem("decelRateLevel2").Value);
             fallSpeed = int.Parse(playerNode.Attributes.GetNamedItem("fallSpeed").Value);
+            fallSpeedLevel2 = int.Parse(playerNode.Attributes.GetNamedItem("fallSpeedLevel2").Value);
             gravity = float.Parse(playerNode.Attributes.GetNamedItem("gravity").Value);
+            gravityLevel2 = float.Parse(playerNode.Attributes.GetNamedItem("gravityLevel2").Value);
             jumpSpeed = int.Parse(playerNode.Attributes.GetNamedItem("jumpSpeed").Value);
             maxSpeedLevel2 = int.Parse(playerNode.Attributes.GetNamedItem("maxSpeedLevel2").Value);
             jumpSpeedLevel2 = int.Parse(playerNode.Attributes.GetNamedItem("jumpSpeedLevel2").Value);
             firstTransformThreshold = int.Parse(playerNode.Attributes.GetNamedItem("firstTransformThreshold").Value);
-            //hud.Score = 60;
+            secondTransformThreshold = int.Parse(playerNode.Attributes.GetNamedItem("secondTransformThreshold").Value);
 
             maxHealth = 100;
             health = maxHealth;
@@ -219,7 +228,13 @@ namespace FoodFighter
 
             if (fatState == FatState.Level1 && hud.Score >= firstTransformThreshold)
             {
-                transform();
+                if(LevelManager.Instance().currentLevel == "Content/XML/TutorialLevel.xml")
+                    transform();
+            }
+            if (fatState == FatState.Level1 && hud.Score >= secondTransformThreshold)
+            {
+                if (LevelManager.Instance().currentLevel != "Content/XML/TutorialLevel.xml")
+                    transform();
             }
 
             if (animTimer.Interval != 100 && (myState != PlayerState.Attacking || myState != PlayerState.AirAttack))
@@ -239,7 +254,11 @@ namespace FoodFighter
 
                 fatState = FatState.Level2;
                 jumpSpeed = jumpSpeedLevel2;
-                maxSpeed = maxSpeedLevel2; 
+                maxSpeed = maxSpeedLevel2;
+                fallSpeed = fallSpeedLevel2;
+                gravity = gravityLevel2;
+                accelRate = accelRateLevel2;
+                decelRate = decelRateLevel2;
 
                 idleAnim = "Player/Level2/HeroIdleRight";
                 idleLeftAnim = "Player/Level2/HeroIdleLeft";
@@ -536,6 +555,10 @@ namespace FoodFighter
         {
             if (!controlsLocked && myState != PlayerState.Hitstun)
             {
+                if (keyState.IsKeyDown(Keys.I) == true && previousKeyState.IsKeyUp(Keys.I) == true)
+                {
+                    hud.Score = 60;
+                }
                 if (keyState.IsKeyDown(Keys.Escape) == true && previousKeyState.IsKeyDown(Keys.Escape) == true)
                 {
                     Game1.Instance().Exit();
@@ -992,17 +1015,25 @@ namespace FoodFighter
             {
                 if (rightMove && !leftMove)
                 {
-                    if (speed.X < maxSpeed || speed.X == 0)
-                        speed.X += currentAccel;
-                    else if (speed.X > -maxSpeed)
-                        speed.X -= runningDecelRate;
+                    //if (speed.X < maxSpeed || speed.X == 0)
+                    //    speed.X += currentAccel;
+                    //else if (speed.X > -maxSpeed)
+                    //    speed.X -= runningDecelRate;
+                    if (myState != PlayerState.Hitstun && myState != PlayerState.Attacking)
+                        speed.X = maxSpeed;
+                    else
+                        speed.X = 0;
                 }
                 if (leftMove && !rightMove)
                 {
-                    if (speed.X > -maxSpeed || speed.X == 0)
-                        speed.X += currentAccel;
-                    else if (speed.X < maxSpeed)
-                        speed.X += runningDecelRate;
+                    //if (speed.X > -maxSpeed || speed.X == 0)
+                    //    speed.X += currentAccel;
+                    //else if (speed.X < maxSpeed)
+                    //    speed.X += runningDecelRate;
+                    if (myState != PlayerState.Hitstun && myState != PlayerState.Attacking)
+                        speed.X = -maxSpeed;
+                    else
+                        speed.X = 0;
                 }
             }
 
@@ -1120,6 +1151,14 @@ namespace FoodFighter
                 if (wall.BoundingBox.Intersects(collisionBox) && !wall.passable)
                 {
                     collidingWall = wall;
+                    if (wall.name == "NextLevel")
+                    {
+                        LevelManager.Instance().nextLevel();
+                    }
+                    else if (wall.name == "DeathBlock")
+                    {
+                        death();
+                    }
                     return true;
                 }
             }

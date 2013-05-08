@@ -38,7 +38,6 @@ namespace FoodFighter
         float camMoveSpeed = 5f;
         bool paused = false;
         public static LevelManager instance;
-        public int lives = 3;
 
         Sprite background = new Sprite("Backgrounds/BLevel1");
         Vector2 backgroundCamera = new Vector2(0, 0);
@@ -47,13 +46,20 @@ namespace FoodFighter
         Color fadeColor = Color.Black;
         Rectangle fadeRect = new Rectangle(0, 0, Game1.Instance().GraphicsDevice.Viewport.Width, Game1.Instance().GraphicsDevice.Viewport.Height);
         int fadeCounter = 5;
+        public int lives = 3;
+
+        string tutorialLevel = "Content/XML/TutorialLevel.xml";
+        string level1 = "Content/XML/Level1.xml";
+        public string currentLevel;
 
         public LevelManager(ContentManager content, SpriteBatch spriteBatch)
         {
             lmContent = content;
             lmSpriteBatch = spriteBatch;
             instance = this;
-            Initialize();
+            Initialize(tutorialLevel);
+
+            currentLevel = tutorialLevel;
         }
 
         public static LevelManager Instance()
@@ -61,8 +67,9 @@ namespace FoodFighter
             return instance;
         }
 
-        public void Initialize()
+        public void Initialize(string theLevel)
         {
+            currentLevel = theLevel;
             level = new LevelConstructor();
 
             LoadContent();
@@ -72,8 +79,8 @@ namespace FoodFighter
 
         public void LoadContent()
         {
-            //level.loadLevel("Content/XML/TestLevel.xml");
-            level.loadLevel("Content/XML/Level1.xml");
+            level.loadLevel(currentLevel);
+            
             listWalls = level.getWallList();
             player.LoadContent(lmContent);
             blackScreen = Game1.Instance().Content.Load<Texture2D>("Menus/BlackScreen");
@@ -114,7 +121,7 @@ namespace FoodFighter
                 }
                 UpdateCamera();
             }
-            else if (levelState == LevelState.Restarting)
+            else if (levelState == LevelState.Restarting || levelState == LevelState.NextLevel)
             {
                 fade();
             }
@@ -125,8 +132,25 @@ namespace FoodFighter
                 enemyList.Clear();
                 player = null;
                 clearLists = false;
-                levelState = LevelState.Gameplay;
-                Initialize();
+
+                if (levelState == LevelState.Restarting)
+                    Initialize(currentLevel);
+                else if (levelState == LevelState.NextLevel)
+                {
+                    if (currentLevel == tutorialLevel)
+                        Initialize(level1);
+                    else if (currentLevel == level1)
+                    {
+                        Game1.Instance().gameState = Game1.GameState.Credits;
+                        Game1.Instance().gotoCredits();
+                        //level2 or game over
+                    }
+                    if (Game1.Instance().gameState != Game1.GameState.Credits)
+                    {
+                        camera.X = player.BoundingBox.X - 288;
+                        camera.Y = player.BoundingBox.Y - 208;
+                    }
+                }  
             }
         }
 
@@ -136,7 +160,7 @@ namespace FoodFighter
             {
                 if (player.BoundingBox.Y > camera.Y + 208)
                 {
-                   if(player.BoundingBox.Y - 208 <= 0)
+                   //if(player.BoundingBox.Y - 208 <= 0)
                         camera.Y = player.BoundingBox.Y + 208;
                 }
                 if (player.BoundingBox.Y < camera.Y + 208)
@@ -230,10 +254,12 @@ namespace FoodFighter
         {
             levelState = LevelState.Restarting;
             fadeColor.A = 0;
-            //clearLists = true;
+        }
 
-            //MediaPlayer.Stop();
-            //MediaPlayer.Play(Game1.Instance().song);
+        public void nextLevel()
+        {
+            levelState = LevelState.NextLevel;
+            fadeColor.A = 0;
         }
 
         public void pause()

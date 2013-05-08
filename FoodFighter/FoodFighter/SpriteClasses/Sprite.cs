@@ -20,8 +20,8 @@ namespace FoodFighter
         SpriteBatch mySpriteBatch;
 
         public Sprite collidingWall;
-        protected int width;
-        protected int height;
+        public int width;
+        public int height;
         public Vector2 position;
         protected Vector2 previousPosition;
         protected Texture2D texture;

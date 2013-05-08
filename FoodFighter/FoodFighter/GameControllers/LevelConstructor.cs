@@ -36,6 +36,9 @@ namespace FoodFighter
         List<int> gidList = new List<int>();
         List<int> gidList2 = new List<int>();
 
+        int playerX;
+        int playerY;
+
         string regularLevel1 = "Content/XML/Level1.xml";
 
         public LevelConstructor()
@@ -56,7 +59,10 @@ namespace FoodFighter
         public void loadLevel(String level)
         {
             currentLevel = level;
-            XmlLoad(currentLevel);
+            if (currentLevel == "Content/XML/TutorialLevel.xml") 
+                XmlLoad(currentLevel, false);
+            else
+                XmlLoad(currentLevel);
         }
 
         //begin XML here
@@ -113,6 +119,7 @@ namespace FoodFighter
             }
             else
             {
+                gidList.Clear();
                 foreach (XmlNode xNode in mapData.FirstChild.NextSibling.NextSibling.NextSibling.FirstChild.ChildNodes)
                 {
                     gidList.Add(int.Parse(xNode.Attributes.GetNamedItem("gid").Value));
@@ -128,6 +135,14 @@ namespace FoodFighter
             Wall theWall;
             Enemy enemy;
             Sprite theObject;
+
+            if (currentLevel == "Content/XML/TutorialLevel.xml")
+            {
+                theObject = new Sprite("LevelObjects/BackImage1", 0, 0);
+                LevelManager.Instance().addToSpriteList(theObject);
+                theObject = new Sprite("LevelObjects/BackImage2", 4096, 0);
+                LevelManager.Instance().addToSpriteList(theObject);
+            }
 
             for (int spriteforX = 0; spriteforX < mapWidth; spriteforX++)
             {
@@ -149,7 +164,7 @@ namespace FoodFighter
                             LevelManager.Instance().addToSpriteList(theWall);
                             break;
                         case 3:
-                            theWall = new Wall(new Vector2(destX, destY), tileWidth, tileHeight, 3);
+                            theWall = new DeathBlock(new Vector2(destX, destY), tileWidth, tileHeight, 3);
                             walls.Add(theWall);
                             LevelManager.Instance().addToSpriteList(theWall);
                             break;
@@ -182,20 +197,34 @@ namespace FoodFighter
                             LevelManager.Instance().addToSpriteList(theObject);
                             break;
                         case 10:
+                            theWall = new Wall(new Vector2(destX, destY), tileWidth, tileHeight, 0, "LevelObjects/DeathBlock", "NextLevel");
+                            walls.Add(theWall);
+                            LevelManager.Instance().addToSpriteList(theWall);
                             break;
                     }
                 }
             }
-            LevelManager.Instance().player = new Player(new Vector2(playerXpos, playerYpos));
-            //LevelManager.Instance().addToEnemyList(enemy);
-            LevelManager.Instance().addToSpriteList(LevelManager.Instance().player);
+            if (currentLevel == "Content/XML/TutorialLevel.xml")
+            {
+                playerX = playerXpos;
+                playerY = playerYpos;
+            }
+            else
+            {
+                LevelManager.Instance().player = new Player(new Vector2(playerXpos, playerYpos));
+                LevelManager.Instance().addToSpriteList(LevelManager.Instance().player);
+            }
+
+            if (currentLevel == "Content/XML/TutorialLevel.xml")
+            {
+                XmlLoad(currentLevel, true);
+            }
 
         }
 
         public void tileLoadBackground()
         {
             Sprite theSprite;
-
             for (int spriteforX = 0; spriteforX < mapWidth; spriteforX++)
             {
                 for (int spriteForY = 0; spriteForY < mapHeight; spriteForY++)
@@ -205,6 +234,12 @@ namespace FoodFighter
 
                     switch (getTileAt(spriteforX, spriteForY))
                     {
+                        case 1:
+                            theSprite = new Sprite("LevelObjects/TutorialLevelLayer", destX, destY);
+                            LevelManager.Instance().addToSpriteList(theSprite);
+                            theSprite = new Sprite("LevelObjects/TutorialLevelLayer2", 4096, 0);
+                            LevelManager.Instance().addToSpriteList(theSprite);
+                            break;
                         case 11:
                             theSprite = new Sprite("Buildings/build1", destX, destY);
                             LevelManager.Instance().addToSpriteList(theSprite);
@@ -236,7 +271,14 @@ namespace FoodFighter
                     }
                 }
             }
-            XmlLoad("Content/XML/Level1.xml", false);
+            if (currentLevel == "Content/XML/Level1.xml")
+                XmlLoad("Content/XML/Level1.xml", false);
+            else
+            {
+                LevelManager.Instance().player = new Player(new Vector2(playerXpos, playerYpos));
+                LevelManager.Instance().addToSpriteList(LevelManager.Instance().player);
+            }
+
         }
 
         public int getTileAt(int x, int y)

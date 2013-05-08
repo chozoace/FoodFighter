@@ -24,7 +24,6 @@ namespace FoodFighter
             Gameplay,
             MainMenu,
             Pause,
-            TutorialScreen,
             Credits
         }
         public GameState gameState = GameState.MainMenu;//should be main menu
@@ -32,6 +31,7 @@ namespace FoodFighter
         LevelManager levelManager;
         MainMenu mainMenu;
         PauseMenu pauseMenu;
+        GameOverScreen credits;
         public static Game1 instance;
         bool singletonEnforcer = false;
 
@@ -66,6 +66,7 @@ namespace FoodFighter
             IsMouseVisible = false;
             mainMenu = new MainMenu();
             pauseMenu = new PauseMenu();
+            credits = new GameOverScreen();
             levelManager = new LevelManager(Content, spriteBatch);
            
             base.Initialize();    
@@ -74,7 +75,7 @@ namespace FoodFighter
         protected override void LoadContent()
         {
             spriteBatch = new SpriteBatch(GraphicsDevice);
-            song = Content.Load<SoundEffect>("Music/EpicSong");
+            song = Content.Load<SoundEffect>("Music/Level1Song");
             songInstance = song.CreateInstance();
             songInstance.IsLooped = true;
         }
@@ -107,6 +108,10 @@ namespace FoodFighter
             {
                 pauseMenu.Update();
             }
+            else if (gameState == GameState.Credits)
+            {
+                credits.Update();
+            }
 
 
 
@@ -128,6 +133,11 @@ namespace FoodFighter
                 pauseMenu.visible = false;
                 gameState = GameState.Gameplay;
             }
+        }
+
+        public void gotoCredits()
+        {
+            credits.createMenu();
         }
 
         public ContentManager getContent()
@@ -190,6 +200,10 @@ namespace FoodFighter
                 {
                     levelManager.drawGame(spriteBatch);
                     pauseMenu.Draw(spriteBatch);
+                }
+                else if (gameState == GameState.Credits)
+                {
+                    credits.Draw(spriteBatch);
                 }
 
                 spriteBatch.End();

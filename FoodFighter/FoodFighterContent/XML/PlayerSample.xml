@@ -1,1 +1,1 @@
-﻿<playerStats  maxSpeed= "6"  jumpSpeed= "-13" maxSpeedLevel2= "10" jumpSpeedLevel2="-18" firstTransformThreshold="60" accelRate ="0.8" decelRate="1.8" gravity="1" fallSpeed="10"/>
+﻿<playerStats  maxSpeed= "4"  jumpSpeed= "-13" maxSpeedLevel2= "6" jumpSpeedLevel2="-18" firstTransformThreshold="60" secondTransformThreshold ="110" accelRate ="0.8" accelRateLevel2 ="0.8" decelRate="1.8" decelRateLevel2 ="1.8" gravity=".8" gravityLevel2="1.2" fallSpeed="10" fallSpeedLevel2="11"/>

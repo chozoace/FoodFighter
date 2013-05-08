@@ -21,6 +21,7 @@ namespace FoodFighter
             //speed.X = 3;
             scoreAward = 20;
 
+            attackLength = 5;
             name = "fry";
             idleAnim = "Enemy/fryidleright";
             idleLeftAnim = "Enemy/fryidleleft";

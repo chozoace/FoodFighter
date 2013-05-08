@@ -56,9 +56,6 @@ namespace FoodFighter
             myHitBox = new Rectangle((int)(position.X), (int)(position.Y), width, height);
             LevelManager.Instance().addToSpriteList(this);
 
-            if(LevelManager.Instance().player.currentChain < 3 && inChain)
-                LevelManager.Instance().player.canAttack = true;
-
             startupTimer.Dispose();
             startupTimer = null;
         }
@@ -72,6 +69,9 @@ namespace FoodFighter
         {
             //remove hitbox
             LevelManager.Instance().removefromSpriteList(this);
+
+            if(LevelManager.Instance().player.currentChain < 3 && inChain)
+                LevelManager.Instance().player.canAttack = true;
             //LevelManager.Instance().player.attacksToNull();
             activeTimer.Dispose();
             activeTimer = null;
@@ -117,7 +117,7 @@ namespace FoodFighter
             else
             {
                 Player player = LevelManager.Instance().player;
-                if (hitBox.Intersects(player.BoundingBox) && canDamage /*&& !player.hitstun*/)
+                if (hitBox.Intersects(player.BoundingBox) && canDamage && player.myState != Player.PlayerState.Hitstun)
                 {
                     player.speed.X = 0;
                     player.currentAccel = 0;

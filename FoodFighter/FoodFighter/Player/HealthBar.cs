@@ -60,7 +60,7 @@ namespace FoodFighter
         public void Draw(SpriteBatch spriteBatch, Vector2 camera, Vector2 playerPosition)
         {
             position.X = playerPosition.X + xOffset;
-            if (LevelManager.Instance().player.BoundingBox.Y - 208 <= 0)
+           // if (LevelManager.Instance().player.BoundingBox.Y - 208 <= 0)
                 position.Y = playerPosition.Y - yOffset;
 
             spriteBatch.Draw(texture, new Rectangle((int)(position.X - camera.X), (int)(position.Y - camera.Y), 250, 30), Color.White);

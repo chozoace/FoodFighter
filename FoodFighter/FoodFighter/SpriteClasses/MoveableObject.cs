@@ -56,7 +56,7 @@ namespace FoodFighter
 
         public void UpdateAnimation(object sender, ElapsedEventArgs e)
         {
-            if (Game1.Instance().gameState == Game1.GameState.Gameplay)
+            if (Game1.Instance().gameState == Game1.GameState.Gameplay && LevelManager.Instance().levelState == LevelManager.LevelState.Gameplay)
             {
                 currentFrame = animationRect.X / 64;
                 totalFrames = (texture.Width / 64) - 1;
