@@ -35,6 +35,7 @@ namespace FoodFighter
         int numberOfTiles;
         List<int> gidList = new List<int>();
         List<int> gidList2 = new List<int>();
+        List<Enemy> enemyList = new List<Enemy>();
 
         int playerX;
         int playerY;
@@ -59,10 +60,10 @@ namespace FoodFighter
         public void loadLevel(String level)
         {
             currentLevel = level;
-            if (currentLevel == "Content/XML/TutorialLevel.xml") 
+            //if (currentLevel == "Content/XML/TutorialLevel.xml") 
                 XmlLoad(currentLevel, false);
-            else
-                XmlLoad(currentLevel);
+            //else
+            //    XmlLoad(currentLevel);
         }
 
         //begin XML here
@@ -175,17 +176,17 @@ namespace FoodFighter
                         case 5:
                             enemy = new OnionEnemy(new Vector2(destX, destY));
                             LevelManager.Instance().addToEnemyList(enemy);
-                            LevelManager.Instance().addToSpriteList(enemy);
+                            enemyList.Add(enemy);
                             break;
                         case 6:
                             enemy = new MeleeEnemy(new Vector2(destX, destY));
                             LevelManager.Instance().addToEnemyList(enemy);
-                            LevelManager.Instance().addToSpriteList(enemy);
+                            enemyList.Add(enemy);
                             break;
                         case 7:
                             enemy = new FryEnemy(new Vector2(destX, destY));
                             LevelManager.Instance().addToEnemyList(enemy);
-                            LevelManager.Instance().addToSpriteList(enemy);
+                            enemyList.Add(enemy);
                             break;
                         case 8:
                             theWall = new ThinFloor(new Vector2(destX, destY), tileWidth, tileHeight, 9, "LevelObjects/ThinFloor");
@@ -204,27 +205,42 @@ namespace FoodFighter
                     }
                 }
             }
-            if (currentLevel == "Content/XML/TutorialLevel.xml")
-            {
+            //if (currentLevel == "Content/XML/TutorialLevel.xml")
+            //{
                 playerX = playerXpos;
                 playerY = playerYpos;
-            }
-            else
-            {
-                LevelManager.Instance().player = new Player(new Vector2(playerXpos, playerYpos));
-                LevelManager.Instance().addToSpriteList(LevelManager.Instance().player);
-            }
+           // }
+            //else
+            //{
+            //    LevelManager.Instance().player = new Player(new Vector2(playerXpos, playerYpos));
+            //    LevelManager.Instance().addToSpriteList(LevelManager.Instance().player);
+            //}
 
-            if (currentLevel == "Content/XML/TutorialLevel.xml")
-            {
+            //if (currentLevel == "Content/XML/TutorialLevel.xml")
+            //{
                 XmlLoad(currentLevel, true);
-            }
+            //}
 
         }
 
         public void tileLoadBackground()
         {
             Sprite theSprite;
+
+            if (currentLevel == "Content/XML/TutorialLevel.xml")
+            {
+                theSprite = new Sprite("LevelObjects/TutorialLevelLayer", 0, 0);
+                LevelManager.Instance().addToSpriteList(theSprite);
+                theSprite = new Sprite("LevelObjects/TutorialLevelLayer2", 4096, 0);
+                LevelManager.Instance().addToSpriteList(theSprite);
+            }
+            else
+            {
+                theSprite = new Sprite("LevelObjects/LevelOneLayer", 0, 0);
+                LevelManager.Instance().addToSpriteList(theSprite);
+                theSprite = new Sprite("LevelObjects/LevelOneLayer2", 4096, 0);
+                LevelManager.Instance().addToSpriteList(theSprite);
+            }
             for (int spriteforX = 0; spriteforX < mapWidth; spriteforX++)
             {
                 for (int spriteForY = 0; spriteForY < mapHeight; spriteForY++)
@@ -232,52 +248,58 @@ namespace FoodFighter
                     int destY = spriteForY * tileHeight;
                     int destX = spriteforX * tileWidth;
 
-                    switch (getTileAt(spriteforX, spriteForY))
-                    {
-                        case 1:
-                            theSprite = new Sprite("LevelObjects/TutorialLevelLayer", destX, destY);
-                            LevelManager.Instance().addToSpriteList(theSprite);
-                            theSprite = new Sprite("LevelObjects/TutorialLevelLayer2", 4096, 0);
-                            LevelManager.Instance().addToSpriteList(theSprite);
-                            break;
-                        case 11:
-                            theSprite = new Sprite("Buildings/build1", destX, destY);
-                            LevelManager.Instance().addToSpriteList(theSprite);
-                            break;
-                        case 12:
-                            theSprite = new Sprite("Buildings/build2", destX, destY);
-                            LevelManager.Instance().addToSpriteList(theSprite);
-                            break;
-                        case 13:
-                            theSprite = new Sprite("Buildings/build3", destX, destY);
-                            LevelManager.Instance().addToSpriteList(theSprite);
-                            break;
-                        case 14:
-                            theSprite = new Sprite("Buildings/build4", destX, destY);
-                            LevelManager.Instance().addToSpriteList(theSprite);
-                            break;
-                        case 15:
-                            theSprite = new Sprite("Buildings/build5", destX, destY);
-                            LevelManager.Instance().addToSpriteList(theSprite);
-                            break;
-                        case 16:
-                            theSprite = new Sprite("Buildings/build6", destX, destY);
-                            LevelManager.Instance().addToSpriteList(theSprite);
-                            break;
-                        case 17:
-                            theSprite = new Sprite("Buildings/build7", destX, destY);
-                            LevelManager.Instance().addToSpriteList(theSprite);
-                            break;
-                    }
+                   
+                    //switch (getTileAt(spriteforX, spriteForY))
+                    //{
+                    //    case 1:
+                    //        theSprite = new Sprite("LevelObjects/TutorialLevelLayer", destX, destY);
+                    //        LevelManager.Instance().addToSpriteList(theSprite);
+                    //        theSprite = new Sprite("LevelObjects/TutorialLevelLayer2", 4096, 0);
+                    //        LevelManager.Instance().addToSpriteList(theSprite);
+                    //        break;
+                    //    case 11:
+                    //        theSprite = new Sprite("Buildings/build1", destX, destY);
+                    //        LevelManager.Instance().addToSpriteList(theSprite);
+                    //        break;
+                    //    case 12:
+                    //        theSprite = new Sprite("Buildings/build2", destX, destY);
+                    //        LevelManager.Instance().addToSpriteList(theSprite);
+                    //        break;
+                    //    case 13:
+                    //        theSprite = new Sprite("Buildings/build3", destX, destY);
+                    //        LevelManager.Instance().addToSpriteList(theSprite);
+                    //        break;
+                    //    case 14:
+                    //        theSprite = new Sprite("Buildings/build4", destX, destY);
+                    //        LevelManager.Instance().addToSpriteList(theSprite);
+                    //        break;
+                    //    case 15:
+                    //        theSprite = new Sprite("Buildings/build5", destX, destY);
+                    //        LevelManager.Instance().addToSpriteList(theSprite);
+                    //        break;
+                    //    case 16:
+                    //        theSprite = new Sprite("Buildings/build6", destX, destY);
+                    //        LevelManager.Instance().addToSpriteList(theSprite);
+                    //        break;
+                    //    case 17:
+                    //        theSprite = new Sprite("Buildings/build7", destX, destY);
+                    //        LevelManager.Instance().addToSpriteList(theSprite);
+                    //        break;
+                    //}
                 }
             }
-            if (currentLevel == "Content/XML/Level1.xml")
-                XmlLoad("Content/XML/Level1.xml", false);
-            else
+            //if (currentLevel == "Content/XML/Level1.xml")
+            //    XmlLoad("Content/XML/Level1.xml", false);
+            //else
+            //{
+            foreach (Enemy theEnemy in enemyList)
             {
+                LevelManager.Instance().addToSpriteList(theEnemy);
+            }
+                
                 LevelManager.Instance().player = new Player(new Vector2(playerXpos, playerYpos));
                 LevelManager.Instance().addToSpriteList(LevelManager.Instance().player);
-            }
+            //}
 
         }
 

@@ -557,7 +557,7 @@ namespace FoodFighter
             {
                 if (keyState.IsKeyDown(Keys.I) == true && previousKeyState.IsKeyUp(Keys.I) == true)
                 {
-                    hud.Score = 60;
+                    //hud.Score = 60;
                 }
                 if (keyState.IsKeyDown(Keys.Escape) == true && previousKeyState.IsKeyDown(Keys.Escape) == true)
                 {
