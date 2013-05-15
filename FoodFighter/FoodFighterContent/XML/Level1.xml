@@ -1,4 +1,4 @@
-
+ 
 <map version="1.0" orientation="orthogonal" width="180" height="30" tilewidth="32" tileheight="32">
  <tileset firstgid="1" name="Bloack tileset2" tilewidth="32" tileheight="32">
   <image source="../Bloack tileset2.png" width="64" height="160"/>
@@ -1481,9 +1481,9 @@
    <tile gid="0"/>
    <tile gid="0"/>
    <tile gid="8"/>
-   <tile gid="0"/>
-   <tile gid="0"/>
-   <tile gid="0"/>
+   <tile gid="8"/>
+   <tile gid="8"/>
+   <tile gid="8"/>
    <tile gid="8"/>
    <tile gid="0"/>
    <tile gid="0"/>
@@ -1964,11 +1964,11 @@
    <tile gid="0"/>
    <tile gid="0"/>
    <tile gid="0"/>
-   <tile gid="0"/>
-   <tile gid="0"/>
-   <tile gid="0"/>
-   <tile gid="0"/>
-   <tile gid="0"/>
+   <tile gid="8"/>
+   <tile gid="8"/>
+   <tile gid="8"/>
+   <tile gid="8"/>
+   <tile gid="8"/>
    <tile gid="0"/>
    <tile gid="0"/>
    <tile gid="0"/>
@@ -2144,9 +2144,9 @@
    <tile gid="0"/>
    <tile gid="0"/>
    <tile gid="0"/>
-   <tile gid="8"/>
-   <tile gid="8"/>
-   <tile gid="8"/>
+   <tile gid="0"/>
+   <tile gid="0"/>
+   <tile gid="0"/>
    <tile gid="0"/>
    <tile gid="0"/>
    <tile gid="0"/>
