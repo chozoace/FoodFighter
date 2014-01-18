@@ -61,10 +61,10 @@
     <XnaCompressContent>true</XnaCompressContent>
   </PropertyGroup>
   <PropertyGroup>
-    <ManifestCertificateThumbprint>7D6739ADD8EC185BA4F754D26DED946A0FE0DD75</ManifestCertificateThumbprint>
+    <ManifestCertificateThumbprint>C10B793D8B6568C14B44A05E1B226FF9B873E56D</ManifestCertificateThumbprint>
   </PropertyGroup>
   <PropertyGroup>
-    <ManifestKeyFile>FoodFighter_TemporaryKey.pfx</ManifestKeyFile>
+    <ManifestKeyFile>FoodFighter_1_TemporaryKey.pfx</ManifestKeyFile>
   </PropertyGroup>
   <PropertyGroup>
     <GenerateManifests>true</GenerateManifests>
@@ -196,6 +196,7 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
+    <None Include="FoodFighter_1_TemporaryKey.pfx" />
     <None Include="FoodFighter_TemporaryKey.pfx" />
   </ItemGroup>
   <ItemGroup />
